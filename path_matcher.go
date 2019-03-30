@@ -5,7 +5,7 @@
  * Date: 2019/03/30
  * Time: 13:10
  */
-package vibrant
+package antpath
 
 /**
  * Strategy interface for based path matching.
