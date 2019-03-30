@@ -18,13 +18,14 @@ type AntPathMatcher struct {
 	pathSeparator string
 	//tokenize pattern cache(thread safe cache)
 	tokenizedPatternCache *sync.Map
+
+	//caseSensitive default value
+	caseSensitive bool
 }
 
 //New
 func New() *AntPathMatcher {
-	ant := &AntPathMatcher{}
-	ant.pathSeparator = DefaultPathSeparator
-	ant.tokenizedPatternCache = new(sync.Map)
+	ant := NewS(DefaultPathSeparator)
 	return ant
 }
 
@@ -36,6 +37,7 @@ func NewS(separator string) *AntPathMatcher{
 	ant := &AntPathMatcher{}
 	ant.pathSeparator = separator
 	ant.tokenizedPatternCache = new(sync.Map)
+	ant.caseSensitive = true
 	return ant
 }
 
