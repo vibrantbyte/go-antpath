@@ -50,23 +50,23 @@ func (ant *AntPathMatcher) doMatch(pattern,path string,fullMatch bool,uriTemplat
 		}
 	}
 
-	if (pathIdxStart > pathIdxEnd){
+	if pathIdxStart > pathIdxEnd{
 		// Path is exhausted, only match if rest of pattern is * or **'s
-		if (pattIdxStart > pattIdxEnd) {
+		if pattIdxStart > pattIdxEnd {
 			if strings.HasSuffix(pattern,ant.pathSeparator){
 				return strings.HasSuffix(path,ant.pathSeparator)
 			}else {
 				return !strings.HasSuffix(path,ant.pathSeparator)
 			}
 		}
-		if (!fullMatch) {
+		if !fullMatch {
 			return true
 		}
-		if (pattIdxStart == pattIdxEnd && strings.EqualFold("*",*pattDirs[pattIdxStart]) && strings.HasSuffix(path,ant.pathSeparator)) {
+		if pattIdxStart == pattIdxEnd && strings.EqualFold("*",*pattDirs[pattIdxStart]) && strings.HasSuffix(path,ant.pathSeparator) {
 			return true
 		}
 		for i:=pattIdxStart;i<=pattIdxEnd;i++  {
-			if (!strings.EqualFold("**",*pattDirs[i])) {
+			if !strings.EqualFold("**",*pattDirs[i]) {
 				return false
 			}
 		}
@@ -80,8 +80,80 @@ func (ant *AntPathMatcher) doMatch(pattern,path string,fullMatch bool,uriTemplat
 	}
 
 	// up to last '**'
+	for {
+		if pattIdxStart <= pattIdxEnd && pathIdxStart <= pathIdxEnd {
+			pattDir := pattDirs[pattIdxEnd]
+			if (strings.EqualFold("**",*pattDir)) {
+				break
+			}
+			if (!ant.matchStrings(*pattDir, *pathDirs[pathIdxEnd], uriTemplateVariables)) {
+				return false
+			}
+			pattIdxEnd--
+			pathIdxEnd--
+		}else {
+			break
+		}
+	}
+	if pathIdxStart > pathIdxEnd {
+		// String is exhausted
+		for i:= pattIdxStart;i<=pattIdxEnd;i++{
+			if !strings.EqualFold("**",*pattDirs[i]) {
+				return false
+			}
+		}
+		return true
+	}
 
+	for {
+		if pattIdxStart != pattIdxEnd && pathIdxStart <= pathIdxEnd {
+			patIdxTmp := -1
+			for i:=pattIdxStart + 1;i<= pattIdxEnd;i++{
+				if strings.EqualFold("**",*pattDirs[i]) {
+					patIdxTmp = i
+					break
+				}
+			}
+			if patIdxTmp == pattIdxStart + 1 {
+				// '**/**' situation, so skip one
+				pattIdxStart++
+				continue
+			}
+			// Find the pattern between padIdxStart & padIdxTmp in str between
+			// strIdxStart & strIdxEnd
+			patLength := patIdxTmp - pattIdxStart - 1
+			strLength := pathIdxEnd - pathIdxStart + 1
+			foundIdx := -1
 
+		strLoop:
+			for i:=0;i<= strLength - patLength;i++{
+				for j := 0; j < patLength; j++ {
+					subPat := pattDirs[pattIdxStart + j + 1]
+					subStr := pathDirs[pathIdxStart + i + j]
+					if !ant.matchStrings(*subPat, *subStr, uriTemplateVariables) {
+						goto strLoop
+					}
+				}
+				foundIdx = pathIdxStart + i
+				break
+			}
+
+			if foundIdx == -1 {
+				return false
+			}
+
+			pattIdxStart = patIdxTmp
+			pathIdxStart = foundIdx + patLength
+		}else {
+			break
+		}
+	}
+
+	for i:=pattIdxStart;i <= pattIdxEnd; i++ {
+		if !strings.EqualFold ("**",*pattDirs[i]) {
+			return false
+		}
+	}
 	return false
 }
 
