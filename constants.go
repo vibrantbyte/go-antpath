@@ -16,3 +16,12 @@ const(
 	CacheTurnoffThreshold = 65536
 
 )
+
+//WildcardChars
+var WildcardChars []rune
+
+//initial
+func init(){
+	//WildcardChars initial '*', '?', '{'
+	WildcardChars = []rune{'\u002a','\u003f','\u007b'}
+}

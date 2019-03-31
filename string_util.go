@@ -7,7 +7,11 @@
  */
 package antpath
 
-import "strings"
+import (
+	"strings"
+	"unicode/utf8"
+	"unsafe"
+)
 
 //EmptySpace
 const EmptySpace = " "
@@ -52,7 +56,44 @@ func TokenizeToStringArray(str,delimiters string,trimTokens,ignoreEmptyTokens bo
 	return tokens
 }
 
-//TokenizeToStringArray
+//TokenizeToStringArray1
 func TokenizeToStringArray1(str,delimiters string) []*string {
 	return TokenizeToStringArray(str,delimiters,true,true)
+}
+
+//Str2Bytes
+func Str2Bytes(s string) []byte {
+	x := (*[2]uintptr)(unsafe.Pointer(&s))
+	h := [3]uintptr{x[0], x[1], x[1]}
+	return *(*[]byte)(unsafe.Pointer(&h))
+}
+
+//Bytes2Str
+func Bytes2Str(b []byte) string {
+	return *(*string)(unsafe.Pointer(&b))
+}
+
+//StartsWith
+func StartsWith(str,prefix string,toffset int) bool{
+	ta := Str2Bytes(str)
+	to := toffset
+	pa := Str2Bytes(prefix)
+	po := 0
+	pc := utf8.RuneCountInString(prefix)
+	// Note: toffset might be near -1>>>1.
+	if (toffset < 0) || (toffset > utf8.RuneCountInString(str) - pc) {
+		return false
+	}
+	for  {
+		if pc--;pc >= 0 {
+			if ta[to] != pa[po] {
+				to++
+				po++
+				return false
+			}
+		}else{
+			break
+		}
+	}
+	return true
 }

@@ -7,7 +7,10 @@
  */
 package antpath
 
-import "strings"
+import (
+	"strings"
+	"unicode/utf8"
+)
 
 /**
 * Actually match the given {@code path} against the given {@code pattern}.
@@ -53,16 +56,16 @@ func (ant *AntPathMatcher) doMatch(pattern,path string,fullMatch bool,uriTemplat
 	if pathIdxStart > pathIdxEnd{
 		// Path is exhausted, only match if rest of pattern is * or **'s
 		if pattIdxStart > pattIdxEnd {
-			if strings.HasSuffix(pattern,ant.pathSeparator){
-				return strings.HasSuffix(path,ant.pathSeparator)
+			if strings.HasSuffix(pattern, ant.pathSeparator){
+				return strings.HasSuffix(path, ant.pathSeparator)
 			}else {
-				return !strings.HasSuffix(path,ant.pathSeparator)
+				return !strings.HasSuffix(path, ant.pathSeparator)
 			}
 		}
 		if !fullMatch {
 			return true
 		}
-		if pattIdxStart == pattIdxEnd && strings.EqualFold("*",*pattDirs[pattIdxStart]) && strings.HasSuffix(path,ant.pathSeparator) {
+		if pattIdxStart == pattIdxEnd && strings.EqualFold("*",*pattDirs[pattIdxStart]) && strings.HasSuffix(path, ant.pathSeparator) {
 			return true
 		}
 		for i:=pattIdxStart;i<=pattIdxEnd;i++  {
@@ -184,15 +187,110 @@ func (ant *AntPathMatcher) tokenizePattern(pattern string) []*string{
 
 //tokenizePath
 func (ant *AntPathMatcher) tokenizePath(path string) []*string{
-	return TokenizeToStringArray1(path, ant.pathSeparator)
+	return TokenizeToStringArray(path, ant.pathSeparator,ant.trimTokens,true)
 }
 
 //isPotentialMatch
 func (ant *AntPathMatcher) isPotentialMatch(path string,pattDirs []*string) bool{
+	if !ant.trimTokens {
+		pos := 0
+		for _,pattDir := range pattDirs {
+			skipped := ant.skipSeparator(path, pos, ant.pathSeparator)
+			pos += skipped
+			skipped = ant.skipSegment(path, pos, *pattDir)
+			if skipped < utf8.RuneCountInString(*pattDir) {
+				tempPattDir := rune((*pattDir)[0])
+				return skipped > 0 || utf8.RuneCountInString(*pattDir) > 0 && ant.isWildcardChar(tempPattDir)
+			}
+			pos += skipped
+		}
+	}
 	return true
 }
 
+//skipSegment
+func (ant *AntPathMatcher) skipSegment(path string,pos int,prefix string) int {
+	skipped := 0
+	for i := 0; i < utf8.RuneCountInString(prefix); i++ {
+		c := rune(prefix[i])
+		if ant.isWildcardChar(c) {
+			return skipped
+		}
+		currPos := pos + skipped
+		if currPos >= utf8.RuneCountInString(path) {
+			return 0
+		}
+		if c == rune(path[currPos]) {
+			skipped++
+		}
+	}
+	return skipped
+}
+
+//skipSeparator
+func (ant *AntPathMatcher) skipSeparator(path string,pos int,separator string) int{
+	skipped := 0
+	for {
+		if StartsWith (path,separator,pos + skipped) {
+			skipped += utf8.RuneCountInString(separator)
+		}else {
+			break
+		}
+	}
+	return skipped
+}
+
+//isWildcardChar
+func (ant *AntPathMatcher) isWildcardChar(c rune) bool{
+	for _,candidate := range WildcardChars {
+		if c == candidate {
+			return true
+		}
+	}
+	return false
+}
+
+/**
+* Test whether or not a string matches against a pattern.
+*
+* @param pattern the pattern to match against (never {@code null})
+* @param str     the String which must be matched against the pattern (never {@code null})
+* @return {@code true} if the string matches against the pattern, or {@code false} otherwise
+*/
 //matchStrings
 func (ant *AntPathMatcher) matchStrings(pattern,str string,uriTemplateVariables *map[string]string) bool{
-	return true
+	return ant.getStringMatcher(pattern).matchStrings(str, uriTemplateVariables)
+}
+
+/**
+* Build or retrieve an {@link AntPathStringMatcher} for the given pattern.
+* <p>The default implementation checks this AntPathMatcher's internal cache
+* (see {@link #setCachePatterns}), creating a new AntPathStringMatcher instance
+* if no cached copy is found.
+* <p>When encountering too many patterns to cache at runtime (the threshold is 65536),
+* it turns the default cache off, assuming that arbitrary permutations of patterns
+* are coming in, with little chance for encountering a recurring pattern.
+* <p>This method may be overridden to implement a custom cache strategy.
+*
+* @param pattern the pattern to match against (never {@code null})
+* @return a corresponding AntPathStringMatcher (never {@code null})
+* @see #setCachePatterns
+*/
+//getStringMatcher
+func (ant *AntPathMatcher) getStringMatcher(pattern string) *AntPathStringMatcher{
+	var matcher *AntPathStringMatcher
+	cachePatterns := ant.cachePatterns
+	if cachePatterns{
+		value,ok := ant.stringMatcherCache.Load(pattern)
+		if ok && value != nil {
+			matcher = value.(*AntPathStringMatcher)
+		}
+	}
+	if matcher == nil {
+		matcher = NewStringMatcher(pattern, ant.caseSensitive)
+		if cachePatterns {
+			ant.stringMatcherCache.Store(pattern, matcher)
+		}
+	}
+	return matcher
 }

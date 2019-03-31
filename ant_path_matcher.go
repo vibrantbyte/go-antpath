@@ -16,11 +16,19 @@ import (
 type AntPathMatcher struct {
 	//path separator
 	pathSeparator string
-	//tokenize pattern cache(thread safe cache)
+	//tokenize pattern cache(thread safe)
 	tokenizedPatternCache *sync.Map
+	//stringMatcherCache string-matcher cache (thread safe)
+	stringMatcherCache *sync.Map
 
-	//caseSensitive default value
+	//-------private---------//
+	// 忽略大小写（不区分大小写）
+	//caseSensitive default value = true
 	caseSensitive bool
+	//trimTokens default value = false
+	trimTokens bool
+	//cachePatterns default value = true
+	cachePatterns bool
 }
 
 //New
@@ -37,7 +45,10 @@ func NewS(separator string) *AntPathMatcher{
 	ant := &AntPathMatcher{}
 	ant.pathSeparator = separator
 	ant.tokenizedPatternCache = new(sync.Map)
+	ant.stringMatcherCache = new(sync.Map)
 	ant.caseSensitive = true
+	ant.trimTokens = false
+	ant.cachePatterns = true
 	return ant
 }
 
