@@ -294,3 +294,17 @@ func (ant *AntPathMatcher) getStringMatcher(pattern string) *AntPathStringMatche
 	}
 	return matcher
 }
+
+//concat
+func (ant *AntPathMatcher) concat(path1,path2 string) string {
+	path1EndsWithSeparator := strings.HasSuffix(path1,ant.pathSeparator)
+	path2StartsWithSeparator := strings.HasPrefix(path2,ant.pathSeparator)
+
+	if path1EndsWithSeparator && path2StartsWithSeparator {
+		return path1 + path2[1:]
+	} else if path1EndsWithSeparator || path2StartsWithSeparator {
+		return path1 + path2
+	} else {
+		return path1 + ant.pathSeparator + path2
+	}
+}

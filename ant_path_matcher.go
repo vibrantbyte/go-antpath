@@ -125,51 +125,62 @@ func (ant *AntPathMatcher) GetPatternComparator(path string) string {
 //@Override
 //Combine 将pattern1和pattern2联合成一个新的pattern
 func (ant *AntPathMatcher) Combine(pattern1,pattern2 string) string  {
-	//if (!StringUtils.hasText(pattern1) && !StringUtils.hasText(pattern2)) {
-	//	return "";
-	//}
-	//if (!StringUtils.hasText(pattern1)) {
-	//	return pattern2;
-	//}
-	//if (!StringUtils.hasText(pattern2)) {
-	//	return pattern1;
-	//}
+	if !HasText(pattern1) && !HasText(pattern2) {
+		return ""
+	}
+	if !HasText(pattern1) {
+		return pattern2
+	}
+	if !HasText(pattern2) {
+		return pattern1
+	}
+	//处理pattern
+	pattern1ContainsUriVar := strings.Index(pattern1,"{") != -1
+	if !strings.EqualFold(pattern1,pattern2) && !pattern1ContainsUriVar && ant.Match(pattern1, pattern2) {
+		// /* + /hotel -> /hotel ; "/*.*" + "/*.html" -> /*.html
+		// However /user + /user -> /usr/user ; /{foo} + /bar -> /{foo}/bar
+		return pattern2
+	}
+	// /hotels/* + /booking -> /hotels/booking
+	// /hotels/* + booking -> /hotels/booking
+	if strings.HasSuffix(pattern1,ant.pathSeparatorPatternCache.GetEndsOnWildCard()) {
+		return ant.concat(pattern1[0:len(pattern1)-2], pattern2)
+	}
+
+	// /hotels/** + /booking -> /hotels/**/booking
+	// /hotels/** + booking -> /hotels/**/booking
+	if strings.HasSuffix(pattern1,ant.pathSeparatorPatternCache.GetEndsOnDoubleWildCard()) {
+		return ant.concat(pattern1, pattern2)
+	}
+
+	starDotPos1 := strings.Index(pattern1,"*.")
+	if pattern1ContainsUriVar || starDotPos1 == -1 || strings.EqualFold(".",ant.pathSeparator) {
+		// simply concatenate the two patterns
+		return ant.concat(pattern1, pattern2)
+	}
+
+	ext1 := pattern1[starDotPos1+1:]
+	dotPos2 := strings.Index(pattern2,".")
+	file2 := EmptyString
+	ext2 := EmptyString
+	if dotPos2 == -1 {
+		file2 = pattern2
+		ext2 = ""
+	}else{
+		file2 = pattern2[0:dotPos2]
+		ext2 = pattern2[dotPos2:]
+	}
+	ext1All := strings.EqualFold(".*",ext1) || strings.EqualFold(EmptyString,ext1)
+	ext2All := strings.EqualFold (".*",ext2)|| strings.EqualFold(EmptyString,ext2)
+	if !ext1All && !ext2All {
+		panic("Cannot combine patterns: " + pattern1 + " vs " + pattern2)
+	}
 	//
-	//boolean pattern1ContainsUriVar = (pattern1.indexOf('{') != -1);
-	//if (!pattern1.equals(pattern2) && !pattern1ContainsUriVar && match(pattern1, pattern2)) {
-	//	// /* + /hotel -> /hotel ; "/*.*" + "/*.html" -> /*.html
-	//	// However /user + /user -> /usr/user ; /{foo} + /bar -> /{foo}/bar
-	//	return pattern2;
-	//}
-	//
-	//// /hotels/* + /booking -> /hotels/booking
-	//// /hotels/* + booking -> /hotels/booking
-	//if (pattern1.endsWith(this.pathSeparatorPatternCache.getEndsOnWildCard())) {
-	//	return concat(pattern1.substring(0, pattern1.length() - 2), pattern2);
-	//}
-	//
-	//// /hotels/** + /booking -> /hotels/**/booking
-	//// /hotels/** + booking -> /hotels/**/booking
-	//if (pattern1.endsWith(this.pathSeparatorPatternCache.getEndsOnDoubleWildCard())) {
-	//	return concat(pattern1, pattern2);
-	//}
-	//
-	//int starDotPos1 = pattern1.indexOf("*.");
-	//if (pattern1ContainsUriVar || starDotPos1 == -1 || this.pathSeparator.equals(".")) {
-	//	// simply concatenate the two patterns
-	//	return concat(pattern1, pattern2);
-	//}
-	//
-	//String ext1 = pattern1.substring(starDotPos1 + 1);
-	//int dotPos2 = pattern2.indexOf('.');
-	//String file2 = (dotPos2 == -1 ? pattern2 : pattern2.substring(0, dotPos2));
-	//String ext2 = (dotPos2 == -1 ? "" : pattern2.substring(dotPos2));
-	//boolean ext1All = (ext1.equals(".*") || ext1.isEmpty());
-	//boolean ext2All = (ext2.equals(".*") || ext2.isEmpty());
-	//if (!ext1All && !ext2All) {
-	//	throw new IllegalArgumentException("Cannot combine patterns: " + pattern1 + " vs " + pattern2);
-	//}
-	//String ext = (ext1All ? ext2 : ext1);
-	//return file2 + ext;
-	return ""
+	ext := EmptyString
+	if ext1All {
+		ext	= ext2
+	}else{
+		ext = ext1
+	}
+	return file2 + ext
 }
