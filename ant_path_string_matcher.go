@@ -72,21 +72,28 @@ func NewStringMatcher(pattern string) *AntPathStringMatcher  {
 	//字符串拼接
 	var patternBuilder string
 	end := 0
-	matchedList := GlobPattern.FindAllString(pattern,MaxFindCount)
-	if matchedList != nil && len(matchedList) > 0 {
-		for index,matched := range matchedList{
-			patternBuilder += stringMatcher.quote(pattern,end,index)
-			if strings.EqualFold("?",matched){
+	patternBytes := Str2Bytes(pattern)
+	allIndex := GlobPattern.FindAllIndex(patternBytes,MaxFindCount)
+	if allIndex != nil && len(allIndex) > 0 {
+		for _,matched := range allIndex{
+			matchedStart := matched[0]
+			matchedEnd := matched[1]
+			patternBuilder += stringMatcher.quote(pattern,end,matchedStart)
+
+			//matchString
+			matchstr := Bytes2Str(patternBytes[matchedStart:matchedEnd])
+			if strings.EqualFold("?",matchstr){
 				patternBuilder += "."
-			}else if strings.EqualFold("*",matched){
+			}else if strings.EqualFold("*",matchstr){
 				patternBuilder += ".*"
-			}else if strings.HasPrefix(matched,"{") && strings.HasSuffix(matched,"}"){
-				colonIdx := strings.Index(matched,":")
+			}else if strings.HasPrefix(matchstr,"{") && strings.HasSuffix(matchstr,"}"){
+				colonIdx := strings.Index(matchstr,":")
 				if colonIdx == -1{
 					patternBuilder += DefaultVariablePattern
+					stringMatcher.variableNames = append(stringMatcher.variableNames,&matchstr)
 				}else {
-					bytes := Str2Bytes(matched)
-					variablePattern := Bytes2Str(bytes[colonIdx + 1:len(matched)-1])
+					bytes := Str2Bytes(matchstr)
+					variablePattern := Bytes2Str(bytes[colonIdx + 1:len(matchstr)-1])
 					patternBuilder += "("
 					patternBuilder += variablePattern
 					patternBuilder += ")"
@@ -95,7 +102,7 @@ func NewStringMatcher(pattern string) *AntPathStringMatcher  {
 				}
 			}
 			//向后增加end
-
+			end = matchedEnd
 		}
 	}
 	//patternBuilder
