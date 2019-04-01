@@ -22,7 +22,7 @@ import (
 */
 //doMatch
 func (ant *AntPathMatcher) doMatch(pattern,path string,fullMatch bool,uriTemplateVariables *map[string]string) bool{
-	if strings.HasPrefix(path,DefaultPathSeparator) != strings.HasPrefix(pattern,DefaultPathSeparator) {
+	if strings.HasPrefix(path,ant.pathSeparator) != strings.HasPrefix(pattern,ant.pathSeparator) {
 		return false
 	}
 	pattDirs := ant.tokenizePattern(pattern)
