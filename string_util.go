@@ -113,3 +113,8 @@ func IsBlank(source string) bool{
 	}
 	return true
 }
+
+//HasText 判断是否有值
+func HasText(source string) bool{
+	return !IsBlank(source)
+}
