@@ -12,7 +12,7 @@ import (
 	"sync"
 )
 
-//AntPathMatcher
+//AntPathMatcher implement from PathMatcher interface
 type AntPathMatcher struct {
 	//path separator
 	pathSeparator string
@@ -104,3 +104,15 @@ func (ant *AntPathMatcher) ExtractPathWithinPattern(pattern,path string) string{
 
 	return builder
 }
+
+//@Override
+//ExtractUriTemplateVariables
+func (ant *AntPathMatcher) ExtractUriTemplateVariables(pattern,path string) *map[string]string{
+	variables := make(map[string]string)
+	result := ant.doMatch(pattern, path, true, &variables)
+	if !result {
+		panic("Pattern \"" + pattern + "\" is not a match for \"" + path + "\"")
+	}
+	return &variables
+}
+
