@@ -12,3 +12,14 @@ func TestTokenizeToStringArray(t *testing.T) {
 		fmt.Println(*item)
 	}
 }
+
+func TestIsBlank(t *testing.T) {
+	t.Log(IsBlank(""))
+	t.Log(IsBlank(" "))
+	t.Log(IsBlank("		"))
+	t.Log(IsBlank(" t"))
+	t.Log(IsBlank("t "))
+	t.Log(IsBlank("t t"))
+	t.Log(IsBlank("tt"))
+
+}

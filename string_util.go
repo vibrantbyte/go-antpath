@@ -9,6 +9,7 @@ package antpath
 
 import (
 	"strings"
+	"unicode"
 	"unicode/utf8"
 	"unsafe"
 )
@@ -93,6 +94,21 @@ func StartsWith(str,prefix string,toffset int) bool{
 			}
 		}else{
 			break
+		}
+	}
+	return true
+}
+
+//IsBlank 判断是否存在空格
+func IsBlank(source string) bool{
+	if strings.EqualFold(EmptyString,source) {
+		return true
+	}
+	for i := len(source); i > 0; {
+		r, size := utf8.DecodeLastRuneInString(source[0:i])
+		i -= size
+		if !unicode.IsSpace(r){
+			return false
 		}
 	}
 	return true
