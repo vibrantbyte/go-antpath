@@ -19,9 +19,18 @@ const(
 
 //WildcardChars
 var WildcardChars []rune
+//*
+var Asterisk rune
+//?
+var QuestionMark rune
+//{
+var Brackets rune
 
 //initial
 func init(){
+	Asterisk = '\u002a'
+	QuestionMark = '\u003f'
+	Brackets = '\u007b'
 	//WildcardChars initial '*', '?', '{'
-	WildcardChars = []rune{'\u002a','\u003f','\u007b'}
+	WildcardChars = []rune{Asterisk,QuestionMark,Brackets}
 }
