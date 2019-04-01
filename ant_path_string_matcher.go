@@ -10,7 +10,6 @@ package antpath
 import (
 	"regexp"
 	"strings"
-	"unicode/utf8"
 )
 
 /**
@@ -38,6 +37,8 @@ func FindSubmatch
 
 //DefaultVariablePattern
 const DefaultVariablePattern = "(.*)"
+//MaxFindCount default value = 32
+const MaxFindCount = 1<<5
 
 //GlobPattern
 var GlobPattern *regexp.Regexp
@@ -65,18 +66,13 @@ type AntPathStringMatcher struct {
 	pattern *regexp.Regexp
 }
 
-//NewDefaultStringMatcher
-func NewDefaultStringMatcher(pattern string) *AntPathStringMatcher {
-	return NewStringMatcher(pattern, true)
-}
-
-//NewStringMatcher
-func NewStringMatcher(pattern string,caseSensitive bool) *AntPathStringMatcher  {
+//NewStringMatcher-目前是regexp.Compile 不支持多参数（FoldCase  Flags = 1 << iota // case-insensitive match）
+func NewStringMatcher(pattern string) *AntPathStringMatcher  {
 	stringMatcher := &AntPathStringMatcher{}
 	//字符串拼接
 	var patternBuilder string
 	end := 0
-	matchedList := GlobPattern.FindStringSubmatch(pattern)
+	matchedList := GlobPattern.FindAllString(pattern,MaxFindCount)
 	if matchedList != nil && len(matchedList) > 0 {
 		for index,matched := range matchedList{
 			patternBuilder += stringMatcher.quote(pattern,end,index)
@@ -90,7 +86,7 @@ func NewStringMatcher(pattern string,caseSensitive bool) *AntPathStringMatcher  
 					patternBuilder += DefaultVariablePattern
 				}else {
 					bytes := Str2Bytes(matched)
-					variablePattern := Bytes2Str(bytes[colonIdx + 1:utf8.RuneCountInString(matched)])
+					variablePattern := Bytes2Str(bytes[colonIdx + 1:len(matched)-1])
 					patternBuilder += "("
 					patternBuilder += variablePattern
 					patternBuilder += ")"
@@ -98,27 +94,16 @@ func NewStringMatcher(pattern string,caseSensitive bool) *AntPathStringMatcher  
 					stringMatcher.variableNames = append(stringMatcher.variableNames,&variableName)
 				}
 			}
-		}
-	}
+			//向后增加end
 
-	patternBuilder += stringMatcher.quote(pattern,end,utf8.RuneCountInString(pattern))
-	if caseSensitive {
-		reg,err := regexp.Compile(patternBuilder)
-		if err == nil {
-			stringMatcher.pattern = reg
 		}
-	}else{
-		//return regexp.compile(expr, syntax.Perl, false)
-		//reg,err := regexp.Compile(patternBuilder)
-		//reg.FindAllStringSubmatch()
-		//if err == nil {
-		//	stringMatcher.pattern = reg
-		//}
-		//Pattern.compile(patternBuilder.toString(), Pattern.CASE_INSENSITIVE))
 	}
-	//matcher.pattern = pattern
-	//matcher.caseSensitive = caseSensitive
-	
+	//patternBuilder
+	patternBuilder += stringMatcher.quote(pattern,end,len(pattern))
+	reg,err := regexp.Compile(patternBuilder)
+	if err == nil {
+		stringMatcher.pattern = reg
+	}
 	return stringMatcher
 }
 
@@ -130,7 +115,7 @@ func NewStringMatcher(pattern string,caseSensitive bool) *AntPathStringMatcher  
 //matchStrings
 func (sm *AntPathStringMatcher) matchStrings(str string,uriTemplateVariables *map[string]string) bool {
 	//可移植性操作系统接口
-	//matcher := regexp.MustCompilePOSIX(str)
+	//matcher := regexp.MustCompile(str)
 	if uriTemplateVariables != nil{
 		// SPR-8455
 		//matcher.
@@ -155,7 +140,5 @@ func (sm *AntPathStringMatcher) quote(s string,start,end int) string {
 	if start == end {
 		return ""
 	}
-
-	//return Pattern.quote(s.substring(start, end));
-	return ""
+	return regexp.QuoteMeta(s[start:end])
 }

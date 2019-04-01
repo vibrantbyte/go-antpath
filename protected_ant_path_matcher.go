@@ -287,7 +287,7 @@ func (ant *AntPathMatcher) getStringMatcher(pattern string) *AntPathStringMatche
 		}
 	}
 	if matcher == nil {
-		matcher = NewStringMatcher(pattern, ant.caseSensitive)
+		matcher = NewStringMatcher(pattern)
 		if cachePatterns {
 			ant.stringMatcherCache.Store(pattern, matcher)
 		}
