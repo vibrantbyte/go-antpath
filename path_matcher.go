@@ -100,7 +100,7 @@ type PathMatcher interface {
 	 * @return a comparator capable of sorting patterns in order of explicitness
 	 */
 	 //GetPatternComparator
-	 GetPatternComparator(path string) string
+	 GetPatternComparator(path string) *AntPatternComparator
 
 	/**
 	 * Combines two patterns into a new pattern that is returned.
