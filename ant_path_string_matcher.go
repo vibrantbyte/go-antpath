@@ -120,26 +120,29 @@ func NewStringMatcher(pattern string) *AntPathStringMatcher  {
 * @return {@code true} if the string matches against the pattern, or {@code false} otherwise.
 */
 //matchStrings
-func (sm *AntPathStringMatcher) matchStrings(str string,uriTemplateVariables *map[string]string) bool {
-	//可移植性操作系统接口
-	//matcher := regexp.MustCompile(str)
+func (sm *AntPathStringMatcher) matchStrings(str string,uriTemplateVariables *map[string]string) (bool,error) {
+	//byte
+	matchBytes := Str2Bytes(str)
+	findIndex := sm.pattern.FindAllIndex(matchBytes,MaxFindCount)
 	if uriTemplateVariables != nil{
 		// SPR-8455
-		//matcher.
-		//
-		//if len(sm.variableNames) !=  matcher .groupCount()) {
-		//	throw new IllegalArgumentException("The number of capturing groups in the pattern segment " +
-		//		this.pattern + " does not match the number of URI template variables it defines, " +
-		//		"which can occur if capturing groups are used in a URI template regex. " +
-		//		"Use non-capturing groups instead.");
-		//}
-		//for (int i = 1; i <= matcher.groupCount(); i++) {
-		//	String name = this.variableNames.get(i - 1);
-		//	String value = matcher.group(i);
-		//	uriTemplateVariables.put(name, value);
-		//}
+		if findIndex == nil && len(*uriTemplateVariables) != len(findIndex) {
+			panic("The number of capturing groups in the pattern segment " +
+				sm.pattern.String() + " does not match the number of URI template variables it defines, " +
+				"which can occur if capturing groups are used in a URI template regex. " +
+				"Use non-capturing groups instead.")
+		}
+		for i := 1; i <= len(findIndex); i++ {
+			name := sm.variableNames[i - 1]
+			//获取匹配位置
+			matched := findIndex[i]
+			matchedStart := matched[0]
+			matchedEnd := matched[1]
+			value := Bytes2Str(matchBytes[matchedStart:matchedEnd])
+			(*uriTemplateVariables)[*name] = value
+		}
 	}
-	return true
+	return true,nil
 }
 
 //quote
