@@ -118,8 +118,8 @@ func (ant *AntPathMatcher) ExtractUriTemplateVariables(pattern,path string) *map
 
 //@Override
 //GetPatternComparator
-func (ant *AntPathMatcher) GetPatternComparator(path string) string {
-	return ""
+func (ant *AntPathMatcher) GetPatternComparator(path string) *AntPatternComparator {
+	return NewDefaultAntPatternComparator(path)
 }
 
 //@Override
