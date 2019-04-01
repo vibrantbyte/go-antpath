@@ -120,7 +120,7 @@ func NewStringMatcher(pattern string) *AntPathStringMatcher  {
 * @return {@code true} if the string matches against the pattern, or {@code false} otherwise.
 */
 //matchStrings
-func (sm *AntPathStringMatcher) matchStrings(str string,uriTemplateVariables *map[string]string) (bool,error) {
+func (sm *AntPathStringMatcher) matchStrings(str string,uriTemplateVariables *map[string]string) bool {
 	//byte
 	matchBytes := Str2Bytes(str)
 	findIndex := sm.pattern.FindAllIndex(matchBytes,MaxFindCount)
@@ -142,7 +142,7 @@ func (sm *AntPathStringMatcher) matchStrings(str string,uriTemplateVariables *ma
 			(*uriTemplateVariables)[*name] = value
 		}
 	}
-	return true,nil
+	return true
 }
 
 //quote
