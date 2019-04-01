@@ -7,6 +7,8 @@
  */
 package antpath
 
+import "regexp"
+
 const(
 
 	//DefaultPathSeparator Default path separator: "/"
@@ -26,6 +28,9 @@ var QuestionMark rune
 //{
 var Brackets rune
 
+//pattern
+var VariablePattern *regexp.Regexp
+
 //initial
 func init(){
 	Asterisk = '\u002a'
@@ -33,4 +38,10 @@ func init(){
 	Brackets = '\u007b'
 	//WildcardChars initial '*', '?', '{'
 	WildcardChars = []rune{Asterisk,QuestionMark,Brackets}
+
+	//pattern
+	reg,err := regexp.Compile("\\{[^/]+?\\}")
+	if err == nil {
+		VariablePattern = reg
+	}
 }

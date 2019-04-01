@@ -78,3 +78,46 @@ func (pi *PatternInfo) initCounters(){
 		}
 	}
 }
+
+//GetUriVars
+func (pi *PatternInfo) GetUriVars() int {
+	return pi.uriVars
+}
+
+//GetSingleWildcards
+func (pi *PatternInfo) GetSingleWildcards() int {
+	return pi.singleWildcards
+}
+
+//GetDoubleWildcards
+func (pi *PatternInfo) GetDoubleWildcards() int{
+	return pi.doubleWildcards
+}
+
+//IsLeastSpecific
+func (pi *PatternInfo) IsLeastSpecific() bool {
+	return IsBlank(pi.pattern) || pi.catchAllPattern
+}
+
+//IsPrefixPattern
+func (pi *PatternInfo) IsPrefixPattern() bool {
+	return pi.prefixPattern
+}
+
+//GetTotalCount
+func (pi *PatternInfo) GetTotalCount() int {
+	return pi.uriVars + pi.singleWildcards + (2 * pi.doubleWildcards)
+}
+
+/**
+ * Returns the length of the given pattern, where template variables are considered to be 1 long.
+ */
+func (pi *PatternInfo) GetLength() int {
+	if pi.length == 0 {
+		if HasText(pi.pattern)  {
+			target := VariablePattern.ReplaceAllString(pi.pattern,"#")
+			pi.length = len(target)
+		}
+	}
+	return pi.length
+}
