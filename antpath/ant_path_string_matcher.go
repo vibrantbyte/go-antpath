@@ -64,11 +64,39 @@ type AntPathStringMatcher struct {
 	variableNames []*string
 	//pattern
 	pattern *regexp.Regexp
+
+	//caseSensitive 忽略大小写（不区分大小写）
+	caseSensitive bool
 }
 
-//NewStringMatcher-目前是regexp.Compile 不支持多参数（FoldCase  Flags = 1 << iota // case-insensitive match）
-func NewStringMatcher(pattern string) *AntPathStringMatcher  {
+//NewDefaultStringMatcher part match
+func NewDefaultStringMatcher(pattern string,caseSensitive bool)*AntPathStringMatcher{
 	stringMatcher := &AntPathStringMatcher{}
+	//caseSensitive
+	stringMatcher.caseSensitive = caseSensitive
+	//写入表达式
+	reg,err := regexp.Compile(*stringMatcher.patternBuilder(pattern,false,caseSensitive))
+	if err == nil {
+		stringMatcher.pattern = reg
+	}
+	return stringMatcher
+}
+
+//NewMatchesStringMatcher full match
+func NewMatchesStringMatcher(pattern string,caseSensitive bool) *AntPathStringMatcher  {
+	stringMatcher := &AntPathStringMatcher{}
+	//caseSensitive
+	stringMatcher.caseSensitive = caseSensitive
+	//写入表达式
+	reg,err := regexp.Compile(*stringMatcher.patternBuilder(pattern,true,caseSensitive))
+	if err == nil {
+		stringMatcher.pattern = reg
+	}
+	return stringMatcher
+}
+
+
+func (sm *AntPathStringMatcher) patternBuilder(pattern string,matches,caseSensitive bool) *string {
 	//字符串拼接
 	var patternBuilder string
 	end := 0
@@ -78,7 +106,7 @@ func NewStringMatcher(pattern string) *AntPathStringMatcher  {
 		for _,matched := range allIndex{
 			matchedStart := matched[0]
 			matchedEnd := matched[1]
-			patternBuilder += stringMatcher.quote(pattern,end,matchedStart)
+			patternBuilder += sm.quote(pattern,end,matchedStart)
 			//matchString
 			matchstr := Bytes2Str(patternBytes[matchedStart:matchedEnd])
 			if strings.EqualFold("?",matchstr){
@@ -89,7 +117,7 @@ func NewStringMatcher(pattern string) *AntPathStringMatcher  {
 				colonIdx := strings.Index(matchstr,":")
 				if colonIdx == -1{
 					patternBuilder += DefaultVariablePattern
-					stringMatcher.variableNames = append(stringMatcher.variableNames,&matchstr)
+					sm.variableNames = append(sm.variableNames,&matchstr)
 				}else {
 					bytes := Str2Bytes(matchstr)
 					variablePattern := Bytes2Str(bytes[colonIdx + 1:len(matchstr)-1])
@@ -97,7 +125,7 @@ func NewStringMatcher(pattern string) *AntPathStringMatcher  {
 					patternBuilder += variablePattern
 					patternBuilder += ")"
 					variableName :=Bytes2Str(bytes[1:colonIdx])
-					stringMatcher.variableNames = append(stringMatcher.variableNames,&variableName)
+					sm.variableNames = append(sm.variableNames,&variableName)
 				}
 			}
 			//向后增加end
@@ -105,15 +133,16 @@ func NewStringMatcher(pattern string) *AntPathStringMatcher  {
 		}
 	}
 	//patternBuilder
-	patternBuilder += stringMatcher.quote(pattern,end,len(pattern))
-	//追加后匹配
-	patternBuilder = "^" + patternBuilder + "$"
-	//写入表达式
-	reg,err := regexp.Compile(patternBuilder)
-	if err == nil {
-		stringMatcher.pattern = reg
+	patternBuilder += sm.quote(pattern,end,len(pattern))
+	if caseSensitive {
+		patternBuilder = strings.ToLower(patternBuilder)
 	}
-	return stringMatcher
+	//full match
+	if matches {
+		patternBuilder = "^" + patternBuilder + "$"
+	}
+
+	return &patternBuilder
 }
 
 /**

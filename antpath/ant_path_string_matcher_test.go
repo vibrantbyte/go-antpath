@@ -33,9 +33,9 @@ func TestNewStringMatcher(t *testing.T) {
 	{ddd} -> (.*)
 	 */
 
-	NewStringMatcher("{bane}/women/{名称}/{ddd}")
-	NewStringMatcher("{bane}/women/{name:value}/{ddd}")
-	NewStringMatcher("{bane}/women/{名称}/{ddd:111}")
+	NewMatchesStringMatcher("{bane}/women/{名称}/{ddd}",false)
+	NewMatchesStringMatcher("{bane}/women/{name:value}/{ddd}",false)
+	NewMatchesStringMatcher("{bane}/women/{名称}/{ddd:111}",false)
 }
 
 func TestQuote(t *testing.T){
