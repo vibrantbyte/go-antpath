@@ -124,25 +124,29 @@ func (sm *AntPathStringMatcher) matchStrings(str string,uriTemplateVariables *ma
 	//byte
 	matchBytes := Str2Bytes(str)
 	findIndex := sm.pattern.FindAllIndex(matchBytes,MaxFindCount)
-	if uriTemplateVariables != nil{
-		// SPR-8455
-		if findIndex == nil && len(*uriTemplateVariables) != len(findIndex) {
-			panic("The number of capturing groups in the pattern segment " +
-				sm.pattern.String() + " does not match the number of URI template variables it defines, " +
-				"which can occur if capturing groups are used in a URI template regex. " +
-				"Use non-capturing groups instead.")
+	if len(findIndex) > 0 {
+		if uriTemplateVariables != nil{
+			// SPR-8455
+			if findIndex == nil && len(*uriTemplateVariables) != len(findIndex) {
+				panic("The number of capturing groups in the pattern segment " +
+					sm.pattern.String() + " does not match the number of URI template variables it defines, " +
+					"which can occur if capturing groups are used in a URI template regex. " +
+					"Use non-capturing groups instead.")
+			}
+			for i := 1; i <= len(findIndex); i++ {
+				name := sm.variableNames[i - 1]
+				//获取匹配位置
+				matched := findIndex[i]
+				matchedStart := matched[0]
+				matchedEnd := matched[1]
+				value := Bytes2Str(matchBytes[matchedStart:matchedEnd])
+				(*uriTemplateVariables)[*name] = value
+			}
 		}
-		for i := 1; i <= len(findIndex); i++ {
-			name := sm.variableNames[i - 1]
-			//获取匹配位置
-			matched := findIndex[i]
-			matchedStart := matched[0]
-			matchedEnd := matched[1]
-			value := Bytes2Str(matchBytes[matchedStart:matchedEnd])
-			(*uriTemplateVariables)[*name] = value
-		}
+		return true
+	}else{
+		return false
 	}
-	return true
 }
 
 //quote

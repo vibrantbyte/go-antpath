@@ -39,7 +39,7 @@ func TestIsPattern(t *testing.T){
 //TestMatch
 func TestMatch(t *testing.T) {
 	// test exact matching
-	assert.True(t,matcher.Match("test", "test"))
+	//assert.True(t,matcher.Match("test", "test"))
 	//assert.True(t,matcher.Match("/test", "/test"))
 	//assert.True(t,matcher.Match("http://example.org", "http://example.org")) // SPR-14141
 	//assert.False(t,matcher.Match("/test.jpg", "test.jpg"))
@@ -53,8 +53,8 @@ func TestMatch(t *testing.T) {
 	//assert.True(t,matcher.Match("te??", "test"))
 	//assert.True(t,matcher.Match("?es?", "test"))
 	//assert.False(t,matcher.Match("tes?", "tes"))
-	//assert.False(t,matcher.Match("tes?", "testt"))
-	//assert.False(t,matcher.Match("tes?", "tsst"))
+	assert.False(t,matcher.Match("tes?", "testt"))
+	assert.False(t,matcher.Match("tes?", "tsst"))
 	//
 	//// test matching with *'s
 	//assert.True(t,matcher.Match("*", "test"))
