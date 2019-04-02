@@ -15,8 +15,8 @@ func TestMatcher(t *testing.T)  {
 	t.Log(reg.MatchString("testtee"))
 
 
-	reg = regexp.MustCompile("tes.*aa")
-	t.Log(reg.MatchString("test"))
+	reg = regexp.MustCompile("t.e.*s.*$")
+	t.Log(reg.FindAllIndex([]byte("testteaabtestteaa"),2))
 	t.Log(reg.MatchString("testaa"))
 	t.Log(reg.MatchString("testteaab"))
 	//rxp := &syntax.Regexp{}

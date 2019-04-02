@@ -39,24 +39,24 @@ func TestIsPattern(t *testing.T){
 //TestMatch
 func TestMatch(t *testing.T) {
 	// test exact matching
-	//assert.True(t,matcher.Match("test", "test"))
-	//assert.True(t,matcher.Match("/test", "/test"))
-	//assert.True(t,matcher.Match("http://example.org", "http://example.org")) // SPR-14141
-	//assert.False(t,matcher.Match("/test.jpg", "test.jpg"))
-	//assert.False(t,matcher.Match("test", "/test"))
-	//assert.False(t,matcher.Match("/test", "test"))
+//	assert.True(t,matcher.Match("test", "test"))
+//	assert.True(t,matcher.Match("/test", "/test"))
+//	assert.True(t,matcher.Match("http://example.org", "http://example.org")) // SPR-14141
+//	assert.False(t,matcher.Match("/test.jpg", "test.jpg"))
+//	assert.False(t,matcher.Match("test", "/test"))
+//	assert.False(t,matcher.Match("/test", "test"))
+//
+//	// test matching with ?'s
+//	assert.True(t,matcher.Match("t?st", "test"))
+//	assert.True(t,matcher.Match("??st", "test"))
+//	assert.True(t,matcher.Match("tes?", "test"))
+//	assert.True(t,matcher.Match("te??", "test"))
+//	assert.True(t,matcher.Match("?es?", "test"))
+//	assert.False(t,matcher.Match("tes?", "tes"))
+//	assert.False(t,matcher.Match("tes?", "testt"))
+//	assert.False(t,matcher.Match("tes?", "tsst"))
 	//
-	//// test matching with ?'s
-	//assert.True(t,matcher.Match("t?st", "test"))
-	//assert.True(t,matcher.Match("??st", "test"))
-	//assert.True(t,matcher.Match("tes?", "test"))
-	//assert.True(t,matcher.Match("te??", "test"))
-	//assert.True(t,matcher.Match("?es?", "test"))
-	//assert.False(t,matcher.Match("tes?", "tes"))
-	//assert.False(t,matcher.Match("tes?", "testt"))
-	//assert.False(t,matcher.Match("tes?", "tsst"))
-	//
-	// test matching with *'s
+	//test matching with *'s
 	//assert.True(t,matcher.Match("*", "test"))
 	//assert.True(t,matcher.Match("test*", "test"))
 	//assert.True(t,matcher.Match("test*", "testTest"))
@@ -70,7 +70,7 @@ func TestMatch(t *testing.T) {
 	//assert.True(t,matcher.Match("*.*", "test.test.test"))
 	//assert.True(t,matcher.Match("test*aaa", "testblaaaa"))
 	//assert.False(t,matcher.Match("test*", "tst"))
-// --	assert.False(t,matcher.Match("test*", "tsttest"))
+	//assert.False(t,matcher.Match("test*", "tsttest"))
 	//assert.False(t,matcher.Match("test*", "test/"))
 	//assert.False(t,matcher.Match("test*", "test/t"))
 	//assert.False(t,matcher.Match("test/*", "test"))
@@ -78,29 +78,29 @@ func TestMatch(t *testing.T) {
 	//assert.False(t,matcher.Match("*test", "tsttst"))
 	//assert.False(t,matcher.Match("*.*", "tsttst"))
 	//assert.False(t,matcher.Match("test*aaa", "test"))
-	assert.False(t,matcher.Match("test*aaa", "testblaaab"))
+	//assert.False(t,matcher.Match("test*aaa", "testblaaab"))
 	//
-	//// test matching with ?'s and /'s
-	//assert.True(t,matcher.Match("/?", "/a"))
-	//assert.True(t,matcher.Match("/?/a", "/a/a"))
-	//assert.True(t,matcher.Match("/a/?", "/a/b"))
-	//assert.True(t,matcher.Match("/??/a", "/aa/a"))
-	//assert.True(t,matcher.Match("/a/??", "/a/bb"))
-	//assert.True(t,matcher.Match("/?", "/a"))
-	//
-	//// test matching with **'s
-	//assert.True(t,matcher.Match("/**", "/testing/testing"))
-	//assert.True(t,matcher.Match("/*/**", "/testing/testing"))
-	//assert.True(t,matcher.Match("/**/*", "/testing/testing"))
-	//assert.True(t,matcher.Match("/bla/**/bla", "/bla/testing/testing/bla"))
-	//assert.True(t,matcher.Match("/bla/**/bla", "/bla/testing/testing/bla/bla"))
-	//assert.True(t,matcher.Match("/**/test", "/bla/bla/test"))
-	//assert.True(t,matcher.Match("/bla/**/**/bla", "/bla/bla/bla/bla/bla/bla"))
-	//assert.True(t,matcher.Match("/bla*bla/test", "/blaXXXbla/test"))
-	//assert.True(t,matcher.Match("/*bla/test", "/XXXbla/test"))
-	//assert.False(t,matcher.Match("/bla*bla/test", "/blaXXXbl/test"))
-	//assert.False(t,matcher.Match("/*bla/test", "XXXblab/test"))
-	//assert.False(t,matcher.Match("/*bla/test", "XXXbl/test"))
+	// test matching with ?'s and /'s
+	assert.True(t,matcher.Match("/?", "/a"))
+	assert.True(t,matcher.Match("/?/a", "/a/a"))
+	assert.True(t,matcher.Match("/a/?", "/a/b"))
+	assert.True(t,matcher.Match("/??/a", "/aa/a"))
+	assert.True(t,matcher.Match("/a/??", "/a/bb"))
+	assert.True(t,matcher.Match("/?", "/a"))
+
+	// test matching with **'s
+	assert.True(t,matcher.Match("/**", "/testing/testing"))
+	assert.True(t,matcher.Match("/*/**", "/testing/testing"))
+	assert.True(t,matcher.Match("/**/*", "/testing/testing"))
+	assert.True(t,matcher.Match("/bla/**/bla", "/bla/testing/testing/bla"))
+	assert.True(t,matcher.Match("/bla/**/bla", "/bla/testing/testing/bla/bla"))
+	assert.True(t,matcher.Match("/**/test", "/bla/bla/test"))
+	assert.True(t,matcher.Match("/bla/**/**/bla", "/bla/bla/bla/bla/bla/bla"))
+	assert.True(t,matcher.Match("/bla*bla/test", "/blaXXXbla/test"))
+	assert.True(t,matcher.Match("/*bla/test", "/XXXbla/test"))
+	assert.False(t,matcher.Match("/bla*bla/test", "/blaXXXbl/test"))
+	assert.False(t,matcher.Match("/*bla/test", "XXXblab/test"))
+	assert.False(t,matcher.Match("/*bla/test", "XXXbl/test"))
 	//
 	//assert.False(t,matcher.Match("/????", "/bala/bla"))
 	//assert.False(t,matcher.Match("/**/*bla", "/bla/bla/bla/bbb"))
