@@ -44,9 +44,11 @@ func (ant *AntPathMatcher) doMatch(pattern,path string,fullMatch bool,uriTemplat
 			if strings.EqualFold("**", *pattDir) {
 				break
 			}
-			if ant.matchStrings(*pattDir,*pathDirs[pathIdxStart],uriTemplateVariables) {
+			if !ant.matchStrings(*pattDir,*pathDirs[pathIdxStart],uriTemplateVariables) {
 				return false
 			}
+			pattIdxStart++
+			pathIdxStart++
 		}else{
 			//jump out of
 			break
@@ -56,11 +58,7 @@ func (ant *AntPathMatcher) doMatch(pattern,path string,fullMatch bool,uriTemplat
 	if pathIdxStart > pathIdxEnd{
 		// Path is exhausted, only match if rest of pattern is * or **'s
 		if pattIdxStart > pattIdxEnd {
-			if strings.HasSuffix(pattern, ant.pathSeparator){
-				return strings.HasSuffix(path, ant.pathSeparator)
-			}else {
-				return !strings.HasSuffix(path, ant.pathSeparator)
-			}
+			return strings.HasSuffix(pattern, ant.pathSeparator) == strings.HasSuffix(path, ant.pathSeparator)
 		}
 		if !fullMatch {
 			return true
@@ -86,10 +84,10 @@ func (ant *AntPathMatcher) doMatch(pattern,path string,fullMatch bool,uriTemplat
 	for {
 		if pattIdxStart <= pattIdxEnd && pathIdxStart <= pathIdxEnd {
 			pattDir := pattDirs[pattIdxEnd]
-			if (strings.EqualFold("**",*pattDir)) {
+			if strings.EqualFold("**",*pattDir) {
 				break
 			}
-			if (!ant.matchStrings(*pattDir, *pathDirs[pathIdxEnd], uriTemplateVariables)) {
+			if !ant.matchStrings(*pattDir, *pathDirs[pathIdxEnd], uriTemplateVariables) {
 				return false
 			}
 			pattIdxEnd--
@@ -111,7 +109,7 @@ func (ant *AntPathMatcher) doMatch(pattern,path string,fullMatch bool,uriTemplat
 	for {
 		if pattIdxStart != pattIdxEnd && pathIdxStart <= pathIdxEnd {
 			patIdxTmp := -1
-			for i:=pattIdxStart + 1;i<= pattIdxEnd;i++{
+			for i:= pattIdxStart + 1;i<= pattIdxEnd;i++{
 				if strings.EqualFold("**",*pattDirs[i]) {
 					patIdxTmp = i
 					break
