@@ -187,3 +187,25 @@ func (matcher *Matcher) getTextLength() int{
 	return len(matcher.text)
 }
 
+//Match
+func (matcher *Matcher) Match(from,anchor int) bool {
+	matcher.hitEnd = false
+	matcher.requireEnd = false
+	if from < 0 {
+		from = 0
+	}
+	matcher.first  = from
+	if matcher.oldLast < 0 {
+		matcher.oldLast = from
+	}
+	for i := 0; i < len(matcher.groups); i++{
+		matcher.groups[i] = -1
+	}
+	matcher.acceptMode = anchor
+	result := matcher.parentPattern.MatchString(matcher.text)
+	if !result{
+		matcher.first = -1
+	}
+	matcher.oldLast = matcher.last
+	return result
+}
