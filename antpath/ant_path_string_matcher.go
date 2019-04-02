@@ -95,7 +95,54 @@ func NewMatchesStringMatcher(pattern string,caseSensitive bool) *AntPathStringMa
 	return stringMatcher
 }
 
+/**
+* Main entry point.
+*
+* @return {@code true} if the string matches against the pattern, or {@code false} otherwise.
+*/
+//MatchStrings
+func (sm *AntPathStringMatcher) MatchStrings(str string,uriTemplateVariables *map[string]string) bool {
+	//忽略大小写（不区分大小写）
+	if sm.caseSensitive {
+		str = strings.ToLower(str)
+	}
+	//byte
+	matchBytes := Str2Bytes(str)
+	findIndex := sm.pattern.FindAllIndex(matchBytes,MaxFindCount)
+	if len(findIndex) > 0 {
+		if uriTemplateVariables != nil{
+			// SPR-8455
+			if findIndex == nil && len(*uriTemplateVariables) != len(findIndex) {
+				panic("The number of capturing groups in the pattern segment " +
+					sm.pattern.String() + " does not match the number of URI template variables it defines, " +
+					"which can occur if capturing groups are used in a URI template regex. " +
+					"Use non-capturing groups instead.")
+			}
+			for i := 1; i <= len(findIndex); i++ {
+				name := sm.variableNames[i - 1]
+				//获取匹配位置
+				matched := findIndex[i]
+				matchedStart := matched[0]
+				matchedEnd := matched[1]
+				value := Bytes2Str(matchBytes[matchedStart:matchedEnd])
+				(*uriTemplateVariables)[*name] = value
+			}
+		}
+		return true
+	}else{
+		return false
+	}
+}
 
+//quote
+func (sm *AntPathStringMatcher) quote(s string,start,end int) string {
+	if start == end {
+		return ""
+	}
+	return regexp.QuoteMeta(s[start:end])
+}
+
+//patternBuilder
 func (sm *AntPathStringMatcher) patternBuilder(pattern string,matches,caseSensitive bool) *string {
 	//字符串拼接
 	var patternBuilder string
@@ -143,47 +190,4 @@ func (sm *AntPathStringMatcher) patternBuilder(pattern string,matches,caseSensit
 	}
 
 	return &patternBuilder
-}
-
-/**
-* Main entry point.
-*
-* @return {@code true} if the string matches against the pattern, or {@code false} otherwise.
-*/
-//matchStrings
-func (sm *AntPathStringMatcher) matchStrings(str string,uriTemplateVariables *map[string]string) bool {
-	//byte
-	matchBytes := Str2Bytes(str)
-	findIndex := sm.pattern.FindAllIndex(matchBytes,MaxFindCount)
-	if len(findIndex) > 0 {
-		if uriTemplateVariables != nil{
-			// SPR-8455
-			if findIndex == nil && len(*uriTemplateVariables) != len(findIndex) {
-				panic("The number of capturing groups in the pattern segment " +
-					sm.pattern.String() + " does not match the number of URI template variables it defines, " +
-					"which can occur if capturing groups are used in a URI template regex. " +
-					"Use non-capturing groups instead.")
-			}
-			for i := 1; i <= len(findIndex); i++ {
-				name := sm.variableNames[i - 1]
-				//获取匹配位置
-				matched := findIndex[i]
-				matchedStart := matched[0]
-				matchedEnd := matched[1]
-				value := Bytes2Str(matchBytes[matchedStart:matchedEnd])
-				(*uriTemplateVariables)[*name] = value
-			}
-		}
-		return true
-	}else{
-		return false
-	}
-}
-
-//quote
-func (sm *AntPathStringMatcher) quote(s string,start,end int) string {
-	if start == end {
-		return ""
-	}
-	return regexp.QuoteMeta(s[start:end])
 }

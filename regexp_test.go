@@ -20,6 +20,4 @@ func TestMatcher(t *testing.T)  {
 	t.Log(reg.MatchString("testaa"))
 	t.Log(reg.MatchString("testteaab"))
 	//rxp := &syntax.Regexp{}
-
-
 }

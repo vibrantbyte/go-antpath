@@ -255,9 +255,9 @@ func (ant *AntPathMatcher) isWildcardChar(c rune) bool{
 * @param str     the String which must be matched against the pattern (never {@code null})
 * @return {@code true} if the string matches against the pattern, or {@code false} otherwise
 */
-//matchStrings
+//MatchStrings
 func (ant *AntPathMatcher) matchStrings(pattern,str string,uriTemplateVariables *map[string]string) bool{
-	return ant.getStringMatcher(pattern).matchStrings(str, uriTemplateVariables)
+	return ant.getStringMatcher(pattern).MatchStrings(str, uriTemplateVariables)
 }
 
 /**
