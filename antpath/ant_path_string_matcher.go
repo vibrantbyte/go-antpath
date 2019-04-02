@@ -72,12 +72,9 @@ func NewStringMatcher(pattern string) *AntPathStringMatcher  {
 	//字符串拼接
 	var patternBuilder string
 	end := 0
-	endOfMatch := ""
 	patternBytes := Str2Bytes(pattern)
 	allIndex := GlobPattern.FindAllIndex(patternBytes,MaxFindCount)
 	if allIndex != nil && len(allIndex) > 0 {
-		//加入前匹配
-		patternBuilder += ""
 		for _,matched := range allIndex{
 			matchedStart := matched[0]
 			matchedEnd := matched[1]
@@ -88,8 +85,6 @@ func NewStringMatcher(pattern string) *AntPathStringMatcher  {
 				patternBuilder += "."
 			}else if strings.EqualFold("*",matchstr){
 				patternBuilder += ".*"
-				//后匹配
-				endOfMatch = ""
 			}else if strings.HasPrefix(matchstr,"{") && strings.HasSuffix(matchstr,"}"){
 				colonIdx := strings.Index(matchstr,":")
 				if colonIdx == -1{
@@ -112,7 +107,7 @@ func NewStringMatcher(pattern string) *AntPathStringMatcher  {
 	//patternBuilder
 	patternBuilder += stringMatcher.quote(pattern,end,len(pattern))
 	//追加后匹配
-	patternBuilder += endOfMatch
+	patternBuilder = "^" + patternBuilder + "$"
 	//写入表达式
 	reg,err := regexp.Compile(patternBuilder)
 	if err == nil {
