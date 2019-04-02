@@ -53,10 +53,10 @@ func TestMatch(t *testing.T) {
 	//assert.True(t,matcher.Match("te??", "test"))
 	//assert.True(t,matcher.Match("?es?", "test"))
 	//assert.False(t,matcher.Match("tes?", "tes"))
-	assert.False(t,matcher.Match("tes?", "testt"))
-	assert.False(t,matcher.Match("tes?", "tsst"))
+	//assert.False(t,matcher.Match("tes?", "testt"))
+	//assert.False(t,matcher.Match("tes?", "tsst"))
 	//
-	//// test matching with *'s
+	// test matching with *'s
 	//assert.True(t,matcher.Match("*", "test"))
 	//assert.True(t,matcher.Match("test*", "test"))
 	//assert.True(t,matcher.Match("test*", "testTest"))
@@ -70,7 +70,7 @@ func TestMatch(t *testing.T) {
 	//assert.True(t,matcher.Match("*.*", "test.test.test"))
 	//assert.True(t,matcher.Match("test*aaa", "testblaaaa"))
 	//assert.False(t,matcher.Match("test*", "tst"))
-	//assert.False(t,matcher.Match("test*", "tsttest"))
+// --	assert.False(t,matcher.Match("test*", "tsttest"))
 	//assert.False(t,matcher.Match("test*", "test/"))
 	//assert.False(t,matcher.Match("test*", "test/t"))
 	//assert.False(t,matcher.Match("test/*", "test"))
@@ -78,7 +78,7 @@ func TestMatch(t *testing.T) {
 	//assert.False(t,matcher.Match("*test", "tsttst"))
 	//assert.False(t,matcher.Match("*.*", "tsttst"))
 	//assert.False(t,matcher.Match("test*aaa", "test"))
-	//assert.False(t,matcher.Match("test*aaa", "testblaaab"))
+	assert.False(t,matcher.Match("test*aaa", "testblaaab"))
 	//
 	//// test matching with ?'s and /'s
 	//assert.True(t,matcher.Match("/?", "/a"))
