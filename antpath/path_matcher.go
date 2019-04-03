@@ -112,6 +112,17 @@ type PathMatcher interface {
 	 */
 	 //Combine
 	 Combine(pattern1,pattern2 string) string
+
+
+	// -------------------------------  fields -------------------------- //
+	//SetPathSeparator
+	SetPathSeparator(pathSeparator string)
+	//SetCaseSensitive
+	SetCaseSensitive(caseSensitive bool)
+	//SetTrimTokens
+	SetTrimTokens(trimTokens bool)
+	//SetCachePatterns
+	SetCachePatterns(cachePatterns bool)
 }
 
 

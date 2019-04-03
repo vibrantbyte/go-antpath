@@ -93,7 +93,7 @@ func (ant *AntPathMatcher) ExtractPathWithinPattern(pattern,path string) string{
 		patternPart := patternParts[segment]
 		if strings.Index(*patternPart,"*") > -1 || strings.Index(*patternPart,"?") > -1 {
 			for ;segment < len(pathParts); segment++ {
-				if pathStarted || (segment == 0 && !strings.HasSuffix(pattern,ant.pathSeparator)) {
+				if pathStarted || (segment == 0 && !strings.HasPrefix(pattern,ant.pathSeparator)) {
 					builder += ant.pathSeparator
 				}
 				builder += *pathParts[segment]

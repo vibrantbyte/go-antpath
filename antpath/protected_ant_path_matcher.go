@@ -8,6 +8,7 @@
 package antpath
 
 import (
+	"github.com/vibrantbyte/go-antpath/extend"
 	"strings"
 	"unicode/utf8"
 )
@@ -306,4 +307,11 @@ func (ant *AntPathMatcher) concat(path1,path2 string) string {
 	} else {
 		return path1 + ant.pathSeparator + path2
 	}
+}
+
+//deactivatePatternCache
+func (ant *AntPathMatcher) deactivatePatternCache() {
+	ant.cachePatterns = false
+	extend.ClearSyncMap(ant.tokenizedPatternCache)
+	extend.ClearSyncMap(ant.stringMatcherCache)
 }
