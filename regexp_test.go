@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"regexp"
 	"testing"
 )
@@ -20,4 +21,15 @@ func TestMatcher(t *testing.T)  {
 	t.Log(reg.MatchString("testaa"))
 	t.Log(reg.MatchString("testteaab"))
 	//rxp := &syntax.Regexp{}
+
+	i := 0
+	to:
+	for ;i< 10 ; i ++  {
+		fmt.Println(i)
+		if i%2 == 1{
+			continue to
+		}
+	}
+
+
 }

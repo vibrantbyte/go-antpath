@@ -126,13 +126,14 @@ func (ant *AntPathMatcher) doMatch(pattern,path string,fullMatch bool,uriTemplat
 			strLength := pathIdxEnd - pathIdxStart + 1
 			foundIdx := -1
 
+
 		strLoop:
-			for i:=0;i<= strLength - patLength;i++{
-				for j := 0; j < patLength; j++ {
+			for i:=0 ;i<= strLength - patLength;i ++{
+				for j := 0; j < patLength; j ++ {
 					subPat := pattDirs[pattIdxStart + j + 1]
 					subStr := pathDirs[pathIdxStart + i + j]
 					if !ant.matchStrings(*subPat, *subStr, uriTemplateVariables) {
-						goto strLoop
+						continue strLoop
 					}
 				}
 				foundIdx = pathIdxStart + i
@@ -155,7 +156,7 @@ func (ant *AntPathMatcher) doMatch(pattern,path string,fullMatch bool,uriTemplat
 			return false
 		}
 	}
-	return false
+	return true
 }
 
 /**
