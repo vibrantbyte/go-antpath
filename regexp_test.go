@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"regexp"
+	"strings"
 	"testing"
 )
 
@@ -31,5 +32,15 @@ func TestMatcher(t *testing.T)  {
 		}
 	}
 
+
+}
+
+func TestMatcher01(t *testing.T)  {
+	reg := regexp.MustCompile("hotels")
+	t.Log(string(reg.Find([]byte("hotels"))))
+
+	t.Log(reg.FindStringSubmatch("hotels"))
+
+	t.Log(strings.Trim(`{name}`,"{}"))
 
 }

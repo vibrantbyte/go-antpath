@@ -38,6 +38,7 @@ func TestIsPattern(t *testing.T){
 
 func TestMatchLog(t *testing.T){
 	t.Log(matcher.Match("tes?", "test"))
+	t.Log(matcher.Match("/hotels/{hotel}", "/hotels/1"))
 	t.Log(matcher.Match("tes?","tes"))
 	t.Log(matcher.Match("tes?", "testt"))
 	t.Log(matcher.Match("tes?", "tsst"))
@@ -248,36 +249,30 @@ func TestExtractPathWithinPattern(t *testing.T){
 //TestExtractUriTemplateVariables
 func TestExtractUriTemplateVariables(t *testing.T)  {
 	result := matcher.ExtractUriTemplateVariables("/hotels/{hotel}", "/hotels/1")
-	result1 := make(map[string]string)
-	result1["hotel"] = "1"
-	assert.Equal(t,result1, result)
-
+	//assert.Equal(t,"1", (*result)["hotel"])
+	//
 	//result = matcher.ExtractUriTemplateVariables("/h?tels/{hotel}", "/hotels/1")
-	//assertEquals(Collections.singletonMap("hotel", "1"), result)
+	//assert.Equal(t,"1", (*result)["hotel"])
 	//
 	//result = matcher.ExtractUriTemplateVariables("/hotels/{hotel}/bookings/{booking}", "/hotels/1/bookings/2")
-	//Map<String, String> expected = new LinkedHashMap<>()
-	//expected.put("hotel", "1")
-	//expected.put("booking", "2")
-	//assertEquals(expected, result)
+	//assert.Equal(t,"1", (*result)["hotel"])
+	//assert.Equal(t,"2", (*result)["booking"])
 	//
 	//result = matcher.ExtractUriTemplateVariables("/**/hotels/**/{hotel}", "/foo/hotels/bar/1")
-	//assertEquals(Collections.singletonMap("hotel", "1"), result)
-	//
-	//result = matcher.ExtractUriTemplateVariables("/{page}.html", "/42.html")
-	//assertEquals(Collections.singletonMap("page", "42"), result)
-	//
-	//result = matcher.ExtractUriTemplateVariables("/{page}.*", "/42.html")
-	//assertEquals(Collections.singletonMap("page", "42"), result)
-	//
-	//result = matcher.ExtractUriTemplateVariables("/A-{B}-C", "/A-b-C")
-	//assertEquals(Collections.singletonMap("B", "b"), result)
-	//
-	//result = matcher.ExtractUriTemplateVariables("/{name}.{extension}", "/test.html")
-	//expected = new LinkedHashMap<>()
-	//expected.put("name", "test")
-	//expected.put("extension", "html")
-	//assertEquals(expected, result)
+	//assert.Equal(t,"1", (*result)["hotel"])
+
+	result = matcher.ExtractUriTemplateVariables("/{page}.html", "/42.html")
+	assert.Equal(t,"42", (*result)["page"])
+
+	result = matcher.ExtractUriTemplateVariables("/{page}.*", "/42.html")
+	assert.Equal(t,"42", (*result)["page"])
+
+	result = matcher.ExtractUriTemplateVariables("/A-{B}-C", "/A-b-C")
+	assert.Equal(t,"b", (*result)["B"])
+
+	result = matcher.ExtractUriTemplateVariables("/{name}.{extension}", "/test.html")
+	assert.Equal(t,"test", (*result)["name"])
+	assert.Equal(t,"html", (*result)["extension"])
 }
 
 //TestGetPatternComparator

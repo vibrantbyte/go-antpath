@@ -67,11 +67,16 @@ type AntPathStringMatcher struct {
 
 	//caseSensitive 忽略大小写（不区分大小写）
 	caseSensitive bool
+
+	//capturingGroupCount 内部变量计算匹配个数
+	capturingGroupCount int
 }
 
 //NewDefaultStringMatcher part match
 func NewDefaultStringMatcher(pattern string,caseSensitive bool)*AntPathStringMatcher{
 	stringMatcher := &AntPathStringMatcher{}
+	stringMatcher.capturingGroupCount = 0
+	stringMatcher.variableNames = make([]*string,0)
 	//caseSensitive
 	stringMatcher.caseSensitive = caseSensitive
 	//写入表达式
@@ -85,6 +90,8 @@ func NewDefaultStringMatcher(pattern string,caseSensitive bool)*AntPathStringMat
 //NewMatchesStringMatcher full match
 func NewMatchesStringMatcher(pattern string,caseSensitive bool) *AntPathStringMatcher  {
 	stringMatcher := &AntPathStringMatcher{}
+	stringMatcher.capturingGroupCount = 0
+	stringMatcher.variableNames = make([]*string,0)
 	//caseSensitive
 	stringMatcher.caseSensitive = caseSensitive
 	//写入表达式
@@ -108,20 +115,20 @@ func (sm *AntPathStringMatcher) MatchStrings(str string,uriTemplateVariables *ma
 	}
 	//byte
 	matchBytes := Str2Bytes(str)
-	findIndex := sm.pattern.FindAllIndex(matchBytes,MaxFindCount)
+	findIndex := sm.pattern.FindAllSubmatchIndex (matchBytes,MaxFindCount)
 	if len(findIndex) > 0 {
 		if uriTemplateVariables != nil{
 			// SPR-8455
-			if findIndex == nil && len(*uriTemplateVariables) != len(findIndex) {
+			if len(sm.variableNames) != sm.GroupCount() {
 				panic("The number of capturing groups in the pattern segment " +
 					sm.pattern.String() + " does not match the number of URI template variables it defines, " +
 					"which can occur if capturing groups are used in a URI template regex. " +
 					"Use non-capturing groups instead.")
 			}
-			for i := 1; i <= len(findIndex); i++ {
+			for i := 1; i <= sm.GroupCount(); i++ {
 				name := sm.variableNames[i - 1]
 				//获取匹配位置
-				matched := findIndex[i]
+				matched := findIndex[i - 1]
 				matchedStart := matched[0]
 				matchedEnd := matched[1]
 				value := Bytes2Str(matchBytes[matchedStart:matchedEnd])
@@ -132,6 +139,17 @@ func (sm *AntPathStringMatcher) MatchStrings(str string,uriTemplateVariables *ma
 	}else{
 		return false
 	}
+}
+
+//GroupCount
+func (sm *AntPathStringMatcher) GroupCount() int {
+	return sm.capturingGroupCount
+}
+
+//takeOffBrackets
+func (sm *AntPathStringMatcher) takeOffBrackets(source *string) *string{
+	var temp = strings.Trim(*source,"{}")
+	return &temp
 }
 
 //quote
@@ -164,7 +182,7 @@ func (sm *AntPathStringMatcher) patternBuilder(pattern string,matches,caseSensit
 				colonIdx := strings.Index(matchstr,":")
 				if colonIdx == -1{
 					patternBuilder += DefaultVariablePattern
-					sm.variableNames = append(sm.variableNames,&matchstr)
+					sm.variableNames = append(sm.variableNames,sm.takeOffBrackets(&matchstr))
 				}else {
 					bytes := Str2Bytes(matchstr)
 					variablePattern := Bytes2Str(bytes[colonIdx + 1:len(matchstr)-1])
@@ -174,6 +192,8 @@ func (sm *AntPathStringMatcher) patternBuilder(pattern string,matches,caseSensit
 					variableName :=Bytes2Str(bytes[1:colonIdx])
 					sm.variableNames = append(sm.variableNames,&variableName)
 				}
+				// group
+				sm.capturingGroupCount ++
 			}
 			//向后增加end
 			end = matchedEnd
