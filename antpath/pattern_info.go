@@ -38,7 +38,7 @@ func NewDefaultPatternInfo(pattern string) *PatternInfo {
 	if hastext {
 		pi.initCounters()
 		pi.catchAllPattern = strings.EqualFold("/**",pattern)
-		pi.prefixPattern =  pi.catchAllPattern && strings.HasSuffix(pi.pattern,"/**")
+		pi.prefixPattern =  !pi.catchAllPattern && strings.HasSuffix(pi.pattern,"/**")
 	}
 	if pi.uriVars == 0 {
 		if hastext{

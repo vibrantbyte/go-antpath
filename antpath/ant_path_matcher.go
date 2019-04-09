@@ -8,6 +8,7 @@
 package antpath
 
 import (
+	"github.com/vibrantbyte/go-antpath/extend"
 	"strings"
 	"sync"
 )
@@ -24,7 +25,7 @@ type AntPathMatcher struct {
 	pathSeparatorPatternCache *PathSeparatorPatternCache
 
 	//-------private---------//
-	// 忽略大小写（不区分大小写）
+	// 区分大小写
 	//caseSensitive default value = true
 	caseSensitive bool
 	//trimTokens default value = false
@@ -183,4 +184,9 @@ func (ant *AntPathMatcher) Combine(pattern1,pattern2 string) string  {
 		ext = ext1
 	}
 	return file2 + ext
+}
+
+//PatternCacheSize
+func (ant *AntPathMatcher) PatternCacheSize() int{
+	return extend.SyncMapSize(ant.stringMatcherCache)
 }

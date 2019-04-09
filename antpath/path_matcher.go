@@ -75,7 +75,7 @@ type PathMatcher interface {
 	 * (never {@code null})
 	 */
 	 //ExtractPathWithinPattern
-	 ExtractPathWithinPattern(pattern,path string) string
+	ExtractPathWithinPattern(pattern,path string) string
 
 	/**
 	 * Given a pattern and a full path, extract the URI template variables. URI template
@@ -87,7 +87,7 @@ type PathMatcher interface {
 	 * @return a map, containing variable names as keys; variables values as values
 	 */
 	 //ExtractUriTemplateVariables
-	 ExtractUriTemplateVariables(pattern,path string) *map[string]string
+	ExtractUriTemplateVariables(pattern,path string) *map[string]string
 
 	/**
 	 * Given a full path, returns a {@link Comparator} suitable for sorting patterns
@@ -100,7 +100,7 @@ type PathMatcher interface {
 	 * @return a comparator capable of sorting patterns in order of explicitness
 	 */
 	 //GetPatternComparator
-	 GetPatternComparator(path string) *AntPatternComparator
+	GetPatternComparator(path string) *AntPatternComparator
 
 	/**
 	 * Combines two patterns into a new pattern that is returned.
@@ -111,7 +111,7 @@ type PathMatcher interface {
 	 * @throws IllegalArgumentException when the two patterns cannot be combined
 	 */
 	 //Combine
-	 Combine(pattern1,pattern2 string) string
+	Combine(pattern1,pattern2 string) string
 
 
 	// -------------------------------  fields -------------------------- //
@@ -123,6 +123,10 @@ type PathMatcher interface {
 	SetTrimTokens(trimTokens bool)
 	//SetCachePatterns
 	SetCachePatterns(cachePatterns bool)
+
+	// -------------------------------  fields size -------------------------- //
+	//stringMatcherCache *sync.Map size
+	PatternCacheSize() int
 }
 
 

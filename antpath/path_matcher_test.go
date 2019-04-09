@@ -1,6 +1,7 @@
 package antpath
 
 import (
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -297,25 +298,82 @@ func TestExtractUriTemplateVarsRegexQualifiers(t *testing.T) {
 	assert.Equal(t,"com.example", (*result)["symbolicName"])
 	assert.Equal(t,"1.0.0", (*result)["version"])
 
-	//result = matcher.ExtractUriTemplateVariables(
-	//"{symbolicName:[\\w\\.]+}-sources-{version:[\\d\\.]+}-{year:\\d{4}}{month:\\d{2}}{day:\\d{2}}.jar",
-	//"com.example-sources-1.0.0-20100220.jar")
-	//assert.Equal(t,"com.example", (*result)["symbolicName"])
-	//assert.Equal(t,"1.0.0", (*result)["version"])
-	//assert.Equal(t,"2010", (*result)["year"])
-	//assert.Equal(t,"02", (*result)["month"])
-	//assert.Equal(t,"20", (*result)["day"])
-	//
-	//result = matcher.ExtractUriTemplateVariables(
-	//"{symbolicName:[\\p{L}\\.]+}-sources-{version:[\\p{N}\\.\\{\\}]+}.jar",
-	//"com.example-sources-1.0.0.{12}.jar")
-	//assert.Equal(t,"com.example", (*result)["symbolicName"])
-	//assert.Equal(t,"1.0.0.{12}", (*result)["version"])
+	result = matcher.ExtractUriTemplateVariables(
+	"{symbolicName:[\\w\\.]+}-sources-{version:[\\d\\.]+}-{year:\\d{4}}{month:\\d{2}}{day:\\d{2}}.jar",
+	"com.example-sources-1.0.0-20100220.jar")
+	assert.Equal(t,"com.example", (*result)["symbolicName"])
+	assert.Equal(t,"1.0.0", (*result)["version"])
+	assert.Equal(t,"2010", (*result)["year"])
+	assert.Equal(t,"02", (*result)["month"])
+	assert.Equal(t,"20", (*result)["day"])
+
+	result = matcher.ExtractUriTemplateVariables(
+	"{symbolicName:[\\p{L}\\.]+}-sources-{version:[\\p{N}\\.\\{\\}]+}.jar",
+	"com.example-sources-1.0.0.{12}.jar")
+	assert.Equal(t,"com.example", (*result)["symbolicName"])
+	assert.Equal(t,"1.0.0.{12}", (*result)["version"])
+}
+
+/**
+	 * SPR-8455
+	 */
+//TestExtractUriTemplateVarsRegexCapturingGroups
+func TestExtractUriTemplateVarsRegexCapturingGroups(t *testing.T) {
+	result := matcher.ExtractUriTemplateVariables("/web/{id:foo(bar)?}", "/web/foobar")
+	assert.Equal(t,"foobar", (*result)["id"])
 }
 
 //TestGetPatternComparator
 func TestGetPatternComparator(t *testing.T){
+	comparator := matcher.GetPatternComparator("/hotels/new")
 
+	assert.Equal(t,0, comparator.Compare("", ""))
+	assert.Equal(t,1, comparator.Compare("", "/hotels/new"))
+	assert.Equal(t,-1, comparator.Compare("/hotels/new", ""))
+
+	assert.Equal(t,0, comparator.Compare("/hotels/new", "/hotels/new"))
+
+	assert.Equal(t,-1, comparator.Compare("/hotels/new", "/hotels/*"))
+	assert.Equal(t,1, comparator.Compare("/hotels/*", "/hotels/new"))
+	assert.Equal(t,0, comparator.Compare("/hotels/*", "/hotels/*"))
+
+	assert.Equal(t,-1, comparator.Compare("/hotels/new", "/hotels/{hotel}"))
+	assert.Equal(t,1, comparator.Compare("/hotels/{hotel}", "/hotels/new"))
+	assert.Equal(t,0, comparator.Compare("/hotels/{hotel}", "/hotels/{hotel}"))
+	assert.Equal(t,-1, comparator.Compare("/hotels/{hotel}/booking", "/hotels/{hotel}/bookings/{booking}"))
+	assert.Equal(t,1, comparator.Compare("/hotels/{hotel}/bookings/{booking}", "/hotels/{hotel}/booking"))
+
+	// SPR-10550
+	assert.Equal(t,-1, comparator.Compare("/hotels/{hotel}/bookings/{booking}/cutomers/{customer}", "/**"))
+	assert.Equal(t,1, comparator.Compare("/**", "/hotels/{hotel}/bookings/{booking}/cutomers/{customer}"))
+	assert.Equal(t,0, comparator.Compare("/**", "/**"))
+
+	assert.Equal(t,-1, comparator.Compare("/hotels/{hotel}", "/hotels/*"))
+	assert.Equal(t,1, comparator.Compare("/hotels/*", "/hotels/{hotel}"))
+
+	assert.Equal(t,-1, comparator.Compare("/hotels/*", "/hotels/*/**"))
+	assert.Equal(t,1, comparator.Compare("/hotels/*/**", "/hotels/*"))
+
+	assert.Equal(t,-1, comparator.Compare("/hotels/new", "/hotels/new.*"))
+	assert.Equal(t,2, comparator.Compare("/hotels/{hotel}", "/hotels/{hotel}.*"))
+
+	// SPR-6741
+	assert.Equal(t,-1, comparator.Compare("/hotels/{hotel}/bookings/{booking}/cutomers/{customer}", "/hotels/**"))
+	assert.Equal(t,1, comparator.Compare("/hotels/**", "/hotels/{hotel}/bookings/{booking}/cutomers/{customer}"))
+	assert.Equal(t,1, comparator.Compare("/hotels/foo/bar/**", "/hotels/{hotel}"))
+	assert.Equal(t,-1, comparator.Compare("/hotels/{hotel}", "/hotels/foo/bar/**"))
+	assert.Equal(t,2, comparator.Compare("/hotels/**/bookings/**", "/hotels/**"))
+	assert.Equal(t,-2, comparator.Compare("/hotels/**", "/hotels/**/bookings/**"))
+
+	// SPR-8683
+	assert.Equal(t,1, comparator.Compare("/**", "/hotels/{hotel}"))
+
+	// longer is better
+	assert.Equal(t,1, comparator.Compare("/hotels", "/hotels2"))
+
+	// SPR-13139
+	assert.Equal(t,-1, comparator.Compare("*", "*/**"))
+	assert.Equal(t,1, comparator.Compare("*/**", "*"))
 }
 
 //TestCombine
@@ -422,4 +480,45 @@ func TestUniqueDeliminator(t *testing.T){
 	assert.False(t,matcher.Match(".bla*bla.test", ".blaXXXbl.test"))
 	assert.False(t,matcher.Match(".*bla.test", "XXXblab.test"))
 	assert.False(t,matcher.Match(".*bla.test", "XXXbl.test"))
+}
+
+// SPR-8687
+//TestTrimTokensOff
+func TestTrimTokensOff(t *testing.T) {
+	matcher.SetTrimTokens(false)
+	assert.True(t,matcher.Match("/group/{groupName}/members", "/group/sales/members"))
+	assert.True(t,matcher.Match("/group/{groupName}/members", "/group/  sales/members"))
+	assert.False(t,matcher.Match("/group/{groupName}/members", "/Group/  Sales/Members"))
+}
+
+//TestDefaultCacheSetting
+func TestDefaultCacheSetting(t *testing.T) {
+	TestMatch(t)
+	t.Log(matcher.PatternCacheSize())
+	assert.True(t,matcher.PatternCacheSize() > 20)
+
+	for i := 0; i < 65536; i++ {
+		matcher.Match(fmt.Sprint("test?",i), "test")
+		t.Log(i)
+	}
+	// Cache turned off because it went beyond the threshold
+	assert.True(t,matcher.PatternCacheSize()<= 0)
+}
+
+//TestCachePatternsSetToFalse
+func TestCachePatternsSetToFalse(t *testing.T) {
+	matcher.SetCachePatterns(false)
+	TestMatch(t)
+	assert.True(t,matcher.PatternCacheSize()<= 0)
+}
+
+// SPR-13286
+//TestCaseInsensitive
+func TestCaseInsensitive(t *testing.T) {
+	matcher = New()
+	matcher.SetCaseSensitive(false)
+
+	assert.True(t,matcher.Match("/group/{groupName}/members", "/group/sales/members"))
+	assert.True(t,matcher.Match("/group/{groupName}/members", "/Group/Sales/Members"))
+	assert.True(t,matcher.Match("/Group/{groupName}/Members", "/group/Sales/members"))
 }

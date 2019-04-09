@@ -65,7 +65,7 @@ type AntPathStringMatcher struct {
 	//pattern
 	pattern *regexp.Regexp
 
-	//caseSensitive 忽略大小写（不区分大小写）
+	//caseSensitive 区分大小写
 	caseSensitive bool
 
 	//capturingGroupCount 内部变量计算匹配个数
@@ -109,8 +109,8 @@ func NewMatchesStringMatcher(pattern string,caseSensitive bool) *AntPathStringMa
 */
 //MatchStrings
 func (sm *AntPathStringMatcher) MatchStrings(str string,uriTemplateVariables *map[string]string) bool {
-	//忽略大小写（不区分大小写）
-	if sm.caseSensitive {
+	//区分大小写
+	if !sm.caseSensitive {
 		str = strings.ToLower(str)
 	}
 	//byte
@@ -206,7 +206,7 @@ func (sm *AntPathStringMatcher) patternBuilder(pattern string,matches,caseSensit
 	}
 	//patternBuilder
 	patternBuilder += sm.quote(pattern,end,len(pattern))
-	if caseSensitive {
+	if !caseSensitive {
 		patternBuilder = strings.ToLower(patternBuilder)
 	}
 	//full match

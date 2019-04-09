@@ -24,7 +24,7 @@ func (ant *AntPathMatcher) SetPathSeparator(pathSeparator string)  {
 Specify whether to perform pattern matching in a case-sensitive fashion.
 <p>Default is {@code true}. Switch this to {@code false} for case-insensitive matching.
  */
-//SetCaseSensitive 是否忽略大小写 The default is false
+//SetCaseSensitive 区分大小写 The default is false
 func (ant *AntPathMatcher) SetCaseSensitive(caseSensitive bool){
 	ant.caseSensitive = caseSensitive
 }

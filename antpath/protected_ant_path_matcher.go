@@ -288,6 +288,13 @@ func (ant *AntPathMatcher) getStringMatcher(pattern string) *AntPathStringMatche
 	}
 	if matcher == nil {
 		matcher = NewMatchesStringMatcher(pattern,ant.caseSensitive)
+		if cachePatterns && ant.PatternCacheSize() >= CacheTurnoffThreshold {
+			// Try to adapt to the runtime situation that we're encountering:
+			// There are obviously too many different patterns coming in here...
+			// So let's turn off the cache since the patterns are unlikely to be reoccurring.
+			ant.deactivatePatternCache()
+			return matcher
+		}
 		if cachePatterns {
 			ant.stringMatcherCache.Store(pattern, matcher)
 		}

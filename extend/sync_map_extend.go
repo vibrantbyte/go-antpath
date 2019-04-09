@@ -18,3 +18,15 @@ func ClearSyncMap(m *sync.Map) {
 		})
 	}
 }
+
+//SyncMapSize
+func SyncMapSize(m *sync.Map) int{
+	size := 0
+	if m != nil {
+		m.Range(func(key, value interface{}) bool {
+			size++
+			return true
+		})
+	}
+	return size
+}
