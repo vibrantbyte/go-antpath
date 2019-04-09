@@ -14,8 +14,8 @@ func init(){
 }
 
 //export Version
-func Version() string{
-	return "v1.0"
+func Version() *C.char{
+	return C.CString("v1.0")
 }
 
 //export IsPattern
