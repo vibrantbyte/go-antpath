@@ -24,3 +24,27 @@ The default implementation is AntPathMatcher, supporting the  * Ant-style patter
 | /**/example | 匹配(Matches) /app/example, /app/foo/example, 和 /example |
 | /app/**/dir/file. | 匹配(Matches) /app/dir/file.jsp, /app/foo/dir/file.html,/app/foo/bar/dir/file.pdf, 和 /app/dir/file.java	 |
 | /**/*.jsp | 匹配(Matches)任何的.jsp 文件 |
+
+# 基本使用PathMatcher接口
+
+> 使用demo
+```go
+package main
+
+import "fmt"
+import . "github.com/vibrantbyte/go-antpath/antpath"
+
+//matchers
+var matcher PathMatcher
+
+func init(){
+	matcher = New()
+}
+
+func main(){
+	fmt.Println(matcher.Match("test","test"))
+	fmt.Println(matcher.Match("test*aaa", "testblaaaa"))
+	fmt.Println(matcher.Match("t?st", "test"))
+	fmt.Println(matcher.Match("/{bla}.*", "/testing.html"))
+}
+```

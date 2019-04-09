@@ -20,6 +20,8 @@ func init(){
 
 
 func main(){
-	fmt.Println("")
 	fmt.Println(matcher.Match("test","test"))
+	fmt.Println(matcher.Match("test*aaa", "testblaaaa"))
+	fmt.Println(matcher.Match("t?st", "test"))
+	fmt.Println(matcher.Match("/{bla}.*", "/testing.html"))
 }
