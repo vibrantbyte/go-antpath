@@ -49,8 +49,9 @@ func ExtractUriTemplateVariables(pattern,path *C.char) *map[string]string {
 //}
 
 //export Combine
-func Combine(pattern1,pattern2 *C.char) *C.char {
-	return C.CString(pMatcher.Combine(C.GoString(pattern1),C.GoString(pattern2)))
+func Combine(pattern1,pattern2 string) *C.char {
+	result := pMatcher.Combine(pattern1,pattern2)
+	return C.CString(result)
 }
 
 //export SetPathSeparator
