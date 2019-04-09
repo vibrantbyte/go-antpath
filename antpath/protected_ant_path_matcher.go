@@ -171,7 +171,7 @@ func (ant *AntPathMatcher) doMatch(pattern,path string,fullMatch bool,uriTemplat
 func (ant *AntPathMatcher) tokenizePattern(pattern string) []*string{
 	tokenized := make([]*string,0)
 	//The first step is to fetch from the cache map.
-	value,ok := ant.tokenizedPatternCache.Load(pattern)
+	value,ok := ant.tokenizedPatternCache.MyLoad(pattern)
 	if ok {
 		tokenized = value.([]*string)
 	}else{
@@ -179,7 +179,7 @@ func (ant *AntPathMatcher) tokenizePattern(pattern string) []*string{
 		tokenized = ant.tokenizePath(pattern)
 		//add
 		if tokenized != nil {
-			ant.tokenizedPatternCache.Store(pattern,tokenized)
+			ant.tokenizedPatternCache.MyStore(pattern,tokenized)
 		}
 	}
 	return tokenized
@@ -281,7 +281,7 @@ func (ant *AntPathMatcher) getStringMatcher(pattern string) *AntPathStringMatche
 	var matcher *AntPathStringMatcher
 	cachePatterns := ant.cachePatterns
 	if cachePatterns{
-		value,ok := ant.stringMatcherCache.Load(pattern)
+		value,ok := ant.stringMatcherCache.MyLoad(pattern)
 		if ok && value != nil {
 			matcher = value.(*AntPathStringMatcher)
 		}
@@ -296,7 +296,7 @@ func (ant *AntPathMatcher) getStringMatcher(pattern string) *AntPathStringMatche
 			return matcher
 		}
 		if cachePatterns {
-			ant.stringMatcherCache.Store(pattern, matcher)
+			ant.stringMatcherCache.MyStore(pattern, matcher)
 		}
 	}
 	return matcher

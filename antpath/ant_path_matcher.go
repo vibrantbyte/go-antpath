@@ -10,7 +10,6 @@ package antpath
 import (
 	"github.com/vibrantbyte/go-antpath/extend"
 	"strings"
-	"sync"
 )
 
 //AntPathMatcher implement from PathMatcher interface
@@ -18,9 +17,9 @@ type AntPathMatcher struct {
 	//path separator
 	pathSeparator string
 	//tokenize pattern cache(thread safe)
-	tokenizedPatternCache *sync.Map
+	tokenizedPatternCache *extend.SyncMap
 	//stringMatcherCache string-matcher cache (thread safe)
-	stringMatcherCache *sync.Map
+	stringMatcherCache *extend.SyncMap
 	//pathSeparatorPatternCache
 	pathSeparatorPatternCache *PathSeparatorPatternCache
 
@@ -54,8 +53,8 @@ func NewS(separator string) *AntPathMatcher{
 	ant := &AntPathMatcher{}
 	//
 	ant.pathSeparator = separator
-	ant.tokenizedPatternCache = new(sync.Map)
-	ant.stringMatcherCache = new(sync.Map)
+	ant.tokenizedPatternCache = new(extend.SyncMap)
+	ant.stringMatcherCache = new(extend.SyncMap)
 	ant.pathSeparatorPatternCache = NewDefaultPathSeparatorPatternCache(separator)
 
 	//filed
@@ -187,6 +186,6 @@ func (ant *AntPathMatcher) Combine(pattern1,pattern2 string) string  {
 }
 
 //PatternCacheSize
-func (ant *AntPathMatcher) PatternCacheSize() int{
-	return extend.SyncMapSize(ant.stringMatcherCache)
+func (ant *AntPathMatcher) PatternCacheSize() int64{
+	return ant.stringMatcherCache.MyLen()
 }

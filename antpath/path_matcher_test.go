@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"time"
 )
 
 //matchers
@@ -15,6 +16,7 @@ func init(){
 
 //TestIsPattern
 func TestIsPattern(t *testing.T){
+
 	/**
 	 规则：* | ** | ？
 	 */
@@ -136,6 +138,7 @@ func TestMatch(t *testing.T) {
 
 //TestMatchStart
 func TestMatchStart(t *testing.T){
+	
 	// test exact matching
 	assert.True(t,matcher.MatchStart("test", "test"))
 	assert.True(t,matcher.MatchStart("/test", "/test"))
@@ -223,6 +226,7 @@ func TestMatchStart(t *testing.T){
 
 //TestExtractPathWithinPattern
 func TestExtractPathWithinPattern(t *testing.T){
+	
 	assert.Equal(t,"", matcher.ExtractPathWithinPattern("/docs/commit.html", "/docs/commit.html"))
 
 	assert.Equal(t,"cvs/commit", matcher.ExtractPathWithinPattern("/docs/*", "/docs/cvs/commit"))
@@ -249,6 +253,7 @@ func TestExtractPathWithinPattern(t *testing.T){
 
 //TestExtractUriTemplateVariables
 func TestExtractUriTemplateVariables(t *testing.T)  {
+	
 	result := matcher.ExtractUriTemplateVariables("/hotels/{hotel}", "/hotels/1")
 	assert.Equal(t,"1", (*result)["hotel"])
 
@@ -278,6 +283,7 @@ func TestExtractUriTemplateVariables(t *testing.T)  {
 
 //TestExtractUriTemplateVariablesRegex
 func TestExtractUriTemplateVariablesRegex(t *testing.T) {
+	
 
 	result := matcher.ExtractUriTemplateVariables("{symbolicName:[\\w\\.]+}-{version:[\\w\\.]+}.jar", "com.example-1.0.0.jar")
 	assert.Equal(t,"com.example",(*result)["symbolicName"])
@@ -294,6 +300,8 @@ func TestExtractUriTemplateVariablesRegex(t *testing.T) {
 */
 //TestExtractUriTemplateVarsRegexQualifiers
 func TestExtractUriTemplateVarsRegexQualifiers(t *testing.T) {
+	
+
 	result := matcher.ExtractUriTemplateVariables("{symbolicName:[\\p{L}\\.]+}-sources-{version:[\\p{N}\\.]+}.jar", "com.example-sources-1.0.0.jar")
 	assert.Equal(t,"com.example", (*result)["symbolicName"])
 	assert.Equal(t,"1.0.0", (*result)["version"])
@@ -319,12 +327,16 @@ func TestExtractUriTemplateVarsRegexQualifiers(t *testing.T) {
 	 */
 //TestExtractUriTemplateVarsRegexCapturingGroups
 func TestExtractUriTemplateVarsRegexCapturingGroups(t *testing.T) {
+	
+
 	result := matcher.ExtractUriTemplateVariables("/web/{id:foo(bar)?}", "/web/foobar")
 	assert.Equal(t,"foobar", (*result)["id"])
 }
 
 //TestGetPatternComparator
 func TestGetPatternComparator(t *testing.T){
+	
+
 	comparator := matcher.GetPatternComparator("/hotels/new")
 
 	assert.Equal(t,0, comparator.Compare("", ""))
@@ -378,6 +390,8 @@ func TestGetPatternComparator(t *testing.T){
 
 //TestCombine
 func TestCombine(t *testing.T){
+	
+
 	t.Log("TestCombine beginning...")
 
 	assert.Equal(t,"",matcher.Combine("", ""))
@@ -493,29 +507,36 @@ func TestTrimTokensOff(t *testing.T) {
 
 //TestDefaultCacheSetting
 func TestDefaultCacheSetting(t *testing.T) {
+	
+
 	TestMatch(t)
-	t.Log(matcher.PatternCacheSize())
 	assert.True(t,matcher.PatternCacheSize() > 20)
 
+	t1 := time.Now().Nanosecond()
 	for i := 0; i < 65536; i++ {
-		matcher.Match(fmt.Sprint("test?",i), "test")
-		t.Log(i)
+		matcher.Match(fmt.Sprint("test",i), fmt.Sprint("test",i))
 	}
 	// Cache turned off because it went beyond the threshold
 	assert.True(t,matcher.PatternCacheSize()<= 0)
+	t.Log(time.Now().Nanosecond() - t1)
 }
 
 //TestCachePatternsSetToFalse
 func TestCachePatternsSetToFalse(t *testing.T) {
-	matcher.SetCachePatterns(false)
-	TestMatch(t)
-	assert.True(t,matcher.PatternCacheSize()<= 0)
+	matcherFalse := New()
+
+	matcherFalse.SetCachePatterns(false)
+	for i := 0; i < 10; i++ {
+		matcherFalse.Match(fmt.Sprint("test",i), fmt.Sprint("test",i))
+	}
+	t.Log(matcherFalse.PatternCacheSize())
+	assert.True(t,matcherFalse.PatternCacheSize()<= 0)
 }
 
 // SPR-13286
 //TestCaseInsensitive
 func TestCaseInsensitive(t *testing.T) {
-	matcher = New()
+	
 	matcher.SetCaseSensitive(false)
 
 	assert.True(t,matcher.Match("/group/{groupName}/members", "/group/sales/members"))

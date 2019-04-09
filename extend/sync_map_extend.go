@@ -7,26 +7,12 @@
  */
 package extend
 
-import "sync"
-
 //ClearSyncMap
-func ClearSyncMap(m *sync.Map) {
+func ClearSyncMap(m *SyncMap) {
 	if m != nil {
-		m.Range(func(key, value interface{}) bool {
-			m.Delete(key)
+		m.MyRange(func(key, value interface{}) bool {
+			m.MyDelete(key)
 			return true
 		})
 	}
-}
-
-//SyncMapSize
-func SyncMapSize(m *sync.Map) int{
-	size := 0
-	if m != nil {
-		m.Range(func(key, value interface{}) bool {
-			size++
-			return true
-		})
-	}
-	return size
 }

@@ -125,8 +125,8 @@ type PathMatcher interface {
 	SetCachePatterns(cachePatterns bool)
 
 	// -------------------------------  fields size -------------------------- //
-	//stringMatcherCache *sync.Map size
-	PatternCacheSize() int
+	//stringMatcherCache size
+	PatternCacheSize() int64
 }
 
 
