@@ -327,8 +327,6 @@ func TestExtractUriTemplateVarsRegexQualifiers(t *testing.T) {
 	 */
 //TestExtractUriTemplateVarsRegexCapturingGroups
 func TestExtractUriTemplateVarsRegexCapturingGroups(t *testing.T) {
-	
-
 	result := matcher.ExtractUriTemplateVariables("/web/{id:foo(bar)?}", "/web/foobar")
 	assert.Equal(t,"foobar", (*result)["id"])
 }
@@ -507,11 +505,6 @@ func TestTrimTokensOff(t *testing.T) {
 
 //TestDefaultCacheSetting
 func TestDefaultCacheSetting(t *testing.T) {
-	
-
-	TestMatch(t)
-	assert.True(t,matcher.PatternCacheSize() > 20)
-
 	t1 := time.Now().Nanosecond()
 	for i := 0; i < 65536; i++ {
 		matcher.Match(fmt.Sprint("test",i), fmt.Sprint("test",i))
