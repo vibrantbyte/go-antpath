@@ -46,7 +46,7 @@ func TestMatcher01(t *testing.T)  {
 	reg = regexp.MustCompile("/(.*).*")
 	t.Log(reg.FindString("/42.html"))
 
-	reg = regexp.MustCompile("/A-(.*)-C")
+	reg = regexp.MustCompile("^([\\p{L}\\.]+)&")
 	t.Log(reg.FindString("/A-b-C"))
 
 

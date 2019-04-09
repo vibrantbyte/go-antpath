@@ -275,6 +275,44 @@ func TestExtractUriTemplateVariables(t *testing.T)  {
 	assert.Equal(t,"html", (*result)["extension"])
 }
 
+//TestExtractUriTemplateVariablesRegex
+func TestExtractUriTemplateVariablesRegex(t *testing.T) {
+
+	result := matcher.ExtractUriTemplateVariables("{symbolicName:[\\w\\.]+}-{version:[\\w\\.]+}.jar", "com.example-1.0.0.jar")
+	assert.Equal(t,"com.example",(*result)["symbolicName"])
+	assert.Equal(t,"1.0.0",(*result)["version"])
+
+	result = matcher.ExtractUriTemplateVariables("{symbolicName:[\\w\\.]+}-sources-{version:[\\w\\.]+}.jar",
+	"com.example-sources-1.0.0.jar")
+	assert.Equal(t,"com.example", (*result)["symbolicName"])
+	assert.Equal(t,"1.0.0", (*result)["version"])
+}
+
+/**
+* SPR-7787
+*/
+//TestExtractUriTemplateVarsRegexQualifiers
+func TestExtractUriTemplateVarsRegexQualifiers(t *testing.T) {
+	result := matcher.ExtractUriTemplateVariables("{symbolicName:[\\p{L}\\.]+}-sources-{version:[\\p{N}\\.]+}.jar", "com.example-sources-1.0.0.jar")
+	assert.Equal(t,"com.example", (*result)["symbolicName"])
+	assert.Equal(t,"1.0.0", (*result)["version"])
+
+	//result = matcher.ExtractUriTemplateVariables(
+	//"{symbolicName:[\\w\\.]+}-sources-{version:[\\d\\.]+}-{year:\\d{4}}{month:\\d{2}}{day:\\d{2}}.jar",
+	//"com.example-sources-1.0.0-20100220.jar")
+	//assert.Equal(t,"com.example", (*result)["symbolicName"])
+	//assert.Equal(t,"1.0.0", (*result)["version"])
+	//assert.Equal(t,"2010", (*result)["year"])
+	//assert.Equal(t,"02", (*result)["month"])
+	//assert.Equal(t,"20", (*result)["day"])
+	//
+	//result = matcher.ExtractUriTemplateVariables(
+	//"{symbolicName:[\\p{L}\\.]+}-sources-{version:[\\p{N}\\.\\{\\}]+}.jar",
+	//"com.example-sources-1.0.0.{12}.jar")
+	//assert.Equal(t,"com.example", (*result)["symbolicName"])
+	//assert.Equal(t,"1.0.0.{12}", (*result)["version"])
+}
+
 //TestGetPatternComparator
 func TestGetPatternComparator(t *testing.T){
 
@@ -317,6 +355,7 @@ func TestCombine(t *testing.T){
 
 }
 
+// SPR-14247
 //TestMatchWithTrimTokensEnabled
 func TestMatchWithTrimTokensEnabled(t *testing.T){
 	matcher.SetTrimTokens(true)
