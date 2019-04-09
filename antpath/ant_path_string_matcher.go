@@ -115,7 +115,7 @@ func (sm *AntPathStringMatcher) MatchStrings(str string,uriTemplateVariables *ma
 	}
 	//byte
 	matchBytes := Str2Bytes(str)
-	findIndex := sm.pattern.FindAllSubmatchIndex (matchBytes,MaxFindCount)
+	findIndex := sm.pattern.FindSubmatch(matchBytes)
 	if len(findIndex) > 0 {
 		if uriTemplateVariables != nil{
 			// SPR-8455
@@ -128,10 +128,8 @@ func (sm *AntPathStringMatcher) MatchStrings(str string,uriTemplateVariables *ma
 			for i := 1; i <= sm.GroupCount(); i++ {
 				name := sm.variableNames[i - 1]
 				//获取匹配位置
-				matched := findIndex[i - 1]
-				matchedStart := matched[0]
-				matchedEnd := matched[1]
-				value := Bytes2Str(matchBytes[matchedStart:matchedEnd])
+				matched := findIndex[i]
+				value := Bytes2Str(matched)
 				(*uriTemplateVariables)[*name] = value
 			}
 		}
@@ -144,6 +142,13 @@ func (sm *AntPathStringMatcher) MatchStrings(str string,uriTemplateVariables *ma
 //GroupCount
 func (sm *AntPathStringMatcher) GroupCount() int {
 	return sm.capturingGroupCount
+}
+
+//FindSubMatch 子查询
+func (sm *AntPathStringMatcher) FindSubMatch(source []byte,index int) *string {
+	indexCollection := sm.pattern.FindSubmatch(source)
+	result := Bytes2Str(indexCollection[index])
+	return &result
 }
 
 //takeOffBrackets

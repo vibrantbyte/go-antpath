@@ -249,17 +249,17 @@ func TestExtractPathWithinPattern(t *testing.T){
 //TestExtractUriTemplateVariables
 func TestExtractUriTemplateVariables(t *testing.T)  {
 	result := matcher.ExtractUriTemplateVariables("/hotels/{hotel}", "/hotels/1")
-	//assert.Equal(t,"1", (*result)["hotel"])
-	//
-	//result = matcher.ExtractUriTemplateVariables("/h?tels/{hotel}", "/hotels/1")
-	//assert.Equal(t,"1", (*result)["hotel"])
-	//
-	//result = matcher.ExtractUriTemplateVariables("/hotels/{hotel}/bookings/{booking}", "/hotels/1/bookings/2")
-	//assert.Equal(t,"1", (*result)["hotel"])
-	//assert.Equal(t,"2", (*result)["booking"])
-	//
-	//result = matcher.ExtractUriTemplateVariables("/**/hotels/**/{hotel}", "/foo/hotels/bar/1")
-	//assert.Equal(t,"1", (*result)["hotel"])
+	assert.Equal(t,"1", (*result)["hotel"])
+
+	result = matcher.ExtractUriTemplateVariables("/h?tels/{hotel}", "/hotels/1")
+	assert.Equal(t,"1", (*result)["hotel"])
+
+	result = matcher.ExtractUriTemplateVariables("/hotels/{hotel}/bookings/{booking}", "/hotels/1/bookings/2")
+	assert.Equal(t,"1", (*result)["hotel"])
+	assert.Equal(t,"2", (*result)["booking"])
+
+	result = matcher.ExtractUriTemplateVariables("/**/hotels/**/{hotel}", "/foo/hotels/bar/1")
+	assert.Equal(t,"1", (*result)["hotel"])
 
 	result = matcher.ExtractUriTemplateVariables("/{page}.html", "/42.html")
 	assert.Equal(t,"42", (*result)["page"])

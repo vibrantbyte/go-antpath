@@ -43,4 +43,18 @@ func TestMatcher01(t *testing.T)  {
 
 	t.Log(strings.Trim(`{name}`,"{}"))
 
+	reg = regexp.MustCompile("/(.*).*")
+	t.Log(reg.FindString("/42.html"))
+
+	reg = regexp.MustCompile("/A-(.*)-C")
+	t.Log(reg.FindString("/A-b-C"))
+
+
+	reg = regexp.MustCompile("/A-(.*)-C")
+	indexs := reg.FindSubmatch([]byte("/A-b-C"))
+	for index := range indexs  {
+		t.Log(index)
+		t.Log(fmt.Sprint(string(indexs[index])))
+	}
+
 }
