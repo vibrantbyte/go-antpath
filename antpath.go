@@ -19,28 +19,28 @@ func Version() *C.char{
 }
 
 //export IsPattern
-func IsPattern(path string) bool {
-	return pMatcher.IsPattern(path)
+func IsPattern(path *C.char) bool {
+	return pMatcher.IsPattern(C.GoString(path))
 }
 
 //export Match
-func Match(pattern,path string) bool{
-	return pMatcher.Match(pattern,path)
+func Match(pattern,path *C.char) bool{
+	return pMatcher.Match(C.GoString(pattern),C.GoString(path))
 }
 
 //export MatchStart
-func MatchStart(pattern,path string) bool{
-	return pMatcher.MatchStart(pattern,path)
+func MatchStart(pattern,path *C.char) bool{
+	return pMatcher.MatchStart(C.GoString(pattern),C.GoString(path))
 }
 
 //export ExtractPathWithinPattern
-func ExtractPathWithinPattern(pattern,path string) string {
-	return pMatcher.ExtractPathWithinPattern(pattern,path)
+func ExtractPathWithinPattern(pattern,path *C.char) *C.char {
+	return C.CString(pMatcher.ExtractPathWithinPattern(C.GoString(pattern),C.GoString(path)))
 }
 
 //export ExtractUriTemplateVariables
-func ExtractUriTemplateVariables(pattern,path string) *map[string]string {
-	return pMatcher.ExtractUriTemplateVariables(pattern,path)
+func ExtractUriTemplateVariables(pattern,path *C.char) *map[string]string {
+	return pMatcher.ExtractUriTemplateVariables(C.GoString(pattern),C.GoString(path))
 }
 
 ////export GetPatternComparator
@@ -49,13 +49,13 @@ func ExtractUriTemplateVariables(pattern,path string) *map[string]string {
 //}
 
 //export Combine
-func Combine(pattern1,pattern2 string) string {
-	return pMatcher.Combine(pattern1,pattern2)
+func Combine(pattern1,pattern2 *C.char) *C.char {
+	return C.CString(pMatcher.Combine(C.GoString(pattern1),C.GoString(pattern2)))
 }
 
 //export SetPathSeparator
-func SetPathSeparator(pathSeparator string){
-	 pMatcher.SetPathSeparator(pathSeparator)
+func SetPathSeparator(pathSeparator *C.char){
+	 pMatcher.SetPathSeparator(C.GoString(pathSeparator))
 }
 
 //export SetCaseSensitive
