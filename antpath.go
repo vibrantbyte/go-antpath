@@ -25,7 +25,7 @@ func IsPattern(path *C.char) bool {
 
 //export Match
 func Match(pattern,path *C.char) bool{
-	return pMatcher.Match(C.GoString(pattern),C.GoString(path))
+	return pMatcher.Match(pattern,path)
 }
 
 //export MatchStart
