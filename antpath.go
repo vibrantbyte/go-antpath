@@ -41,24 +41,19 @@ func MatchStart(pattern,path string) bool{
 
 //export ExtractPathWithinPattern
 func ExtractPathWithinPattern(pattern,path string) *C.char {
-	result := pMatcher.ExtractPathWithinPattern(pattern,path)
-	return C.CString(result)
+	result := C.CString(pMatcher.ExtractPathWithinPattern(pattern,path))
+	return result
 }
 
 //export ExtractUriTemplateVariables
-func ExtractUriTemplateVariables(pattern,path string) map[string]string {
-	return *pMatcher.ExtractUriTemplateVariables(pattern,path)
+func ExtractUriTemplateVariables(pattern,path string) *map[string]string {
+	return pMatcher.ExtractUriTemplateVariables(pattern,path)
 }
-
-////export GetPatternComparator
-//func GetPatternComparator(path string) *AntPatternComparator {
-//	return pMatcher.GetPatternComparator(path)
-//}
 
 //export Combine
 func Combine(pattern1,pattern2 string) *C.char {
-	result := pMatcher.Combine(pattern1,pattern2)
-	return C.CString(result)
+	result := C.CString(pMatcher.Combine(pattern1,pattern2))
+	return result
 }
 
 //export SetPathSeparator
