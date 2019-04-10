@@ -46,8 +46,8 @@ func ExtractPathWithinPattern(pattern,path string) *C.char {
 }
 
 //export ExtractUriTemplateVariables
-func ExtractUriTemplateVariables(pattern,path string) *map[string]string {
-	return pMatcher.ExtractUriTemplateVariables(pattern,path)
+func ExtractUriTemplateVariables(pattern,path string) map[string]string {
+	return *pMatcher.ExtractUriTemplateVariables(pattern,path)
 }
 
 ////export GetPatternComparator
