@@ -3,6 +3,7 @@ package main
 import (
 	"C"
 	. "github.com/vibrantbyte/go-antpath/antpath"
+	"unsafe"
 )
 
 //pMatcher
@@ -16,6 +17,7 @@ func init(){
 //export Version
 func Version() *C.char{
 	var cmsg = C.CString("v1.0")
+	defer C.free(unsafe.Pointer(cmsg))
 	return cmsg
 }
 
