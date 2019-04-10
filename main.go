@@ -7,21 +7,21 @@
  */
 package main
 
-import "fmt"
-import . "github.com/vibrantbyte/go-antpath/antpath"
+// import "fmt"
+// import . "github.com/vibrantbyte/go-antpath/antpath"
 
 
-//matchers
-var matcher PathMatcher
+// //matchers
+// var matcher PathMatcher
 
-func init(){
-	matcher = New()
-}
+// func init(){
+// 	matcher = New()
+// }
 
 
-func main(){
-	fmt.Println(matcher.Match("test","test"))
-	fmt.Println(matcher.Match("test*aaa", "testblaaaa"))
-	fmt.Println(matcher.Match("t?st", "test"))
-	fmt.Println(matcher.Match("/{bla}.*", "/testing.html"))
-}
+// func main(){
+// 	fmt.Println(matcher.Match("test","test"))
+// 	fmt.Println(matcher.Match("test*aaa", "testblaaaa"))
+// 	fmt.Println(matcher.Match("t?st", "test"))
+// 	fmt.Println(matcher.Match("/{bla}.*", "/testing.html"))
+// }
