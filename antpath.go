@@ -56,27 +56,23 @@ func Combine(pattern1,pattern2 string) *C.char {
 }
 
 //export SetPathSeparator
-func SetPathSeparator(pathSeparator string) bool{
+func SetPathSeparator(pathSeparator string){
 	 pMatcher.SetPathSeparator(pathSeparator)
-	 return true
 }
 
 //export SetCaseSensitive
-func SetCaseSensitive(caseSensitive bool) bool{
+func SetCaseSensitive(caseSensitive bool){
 	pMatcher.SetCaseSensitive(caseSensitive)
-	return true
 }
 
 //export SetTrimTokens
-func SetTrimTokens(trimTokens bool) bool{
+func SetTrimTokens(trimTokens bool){
 	pMatcher.SetTrimTokens(trimTokens)
-	return true
 }
 
 //export SetCachePatterns
-func SetCachePatterns(cachePatterns bool) bool{
+func SetCachePatterns(cachePatterns bool){
 	pMatcher.SetCachePatterns(cachePatterns)
-	return true
 }
 
 //main
