@@ -1,7 +1,9 @@
 package main
 
+//#include <stdlib.h>
+import "C"
+
 import (
-	"C"
 	. "github.com/vibrantbyte/go-antpath/antpath"
 	"unsafe"
 )
@@ -44,6 +46,7 @@ func MatchStart(pattern,path string) bool{
 //export ExtractPathWithinPattern
 func ExtractPathWithinPattern(pattern,path string) *C.char {
 	result := C.CString(pMatcher.ExtractPathWithinPattern(pattern,path))
+	defer C.free(unsafe.Pointer(result))
 	return result
 }
 
@@ -55,6 +58,7 @@ func ExtractUriTemplateVariables(pattern,path string) *map[string]string {
 //export Combine
 func Combine(pattern1,pattern2 string) *C.char {
 	result := C.CString(pMatcher.Combine(pattern1,pattern2))
+	defer C.free(unsafe.Pointer(result))
 	return result
 }
 
