@@ -18,6 +18,11 @@ func Version() *C.char{
 	return C.CString("v1.0")
 }
 
+//export Increment
+func Increment(value *int) {
+	*value = *value + 1
+}
+
 //export IsPattern
 func IsPattern(path string) bool {
 	return pMatcher.IsPattern(path)
