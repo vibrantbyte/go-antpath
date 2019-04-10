@@ -4,6 +4,7 @@ package main
 import "C"
 
 import (
+	"encoding/json"
 	. "github.com/vibrantbyte/go-antpath/antpath"
 	"unsafe"
 )
@@ -51,8 +52,16 @@ func ExtractPathWithinPattern(pattern,path string) *C.char {
 }
 
 //export ExtractUriTemplateVariables
-func ExtractUriTemplateVariables(pattern,path string) *map[string]string {
-	return pMatcher.ExtractUriTemplateVariables(pattern,path)
+func ExtractUriTemplateVariables(pattern,path string) *C.char {
+	result := pMatcher.ExtractUriTemplateVariables(pattern,path)
+	target := "{}"
+	if result != nil {
+		b,_ := json.Marshal(result)
+		target = Bytes2Str(b)
+	}
+	cChar := C.CString(target)
+	defer C.free(unsafe.Pointer(cChar))
+	return cChar
 }
 
 //export Combine

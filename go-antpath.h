@@ -69,7 +69,7 @@ extern GoUint8 MatchStart(GoString p0, GoString p1);
 
 extern char* ExtractPathWithinPattern(GoString p0, GoString p1);
 
-extern GoMap* ExtractUriTemplateVariables(GoString p0, GoString p1);
+extern char* ExtractUriTemplateVariables(GoString p0, GoString p1);
 
 extern char* Combine(GoString p0, GoString p1);
 
